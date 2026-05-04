@@ -605,10 +605,14 @@
 
 <script>
       const host = location.hostname || "localhost";
+      const isLocal = host === "localhost" || host === "127.0.0.1" || host.startsWith("192.168.") || host.startsWith("10.") || host.startsWith("172.");
+      
       document.querySelectorAll(".button[data-path]").forEach((link) => {
-        const port = link.dataset.port || "5190";
-        const path = link.dataset.path || "/";
-        link.href = `http://${host}:${port}${encodeURI(path)}`;
+        if (link.dataset.port && isLocal) {
+          const port = link.dataset.port;
+          const path = link.dataset.path || "/";
+          link.href = `http://${host}:${port}${encodeURI(path)}`;
+        }
       });
 
       // Filter Logic
