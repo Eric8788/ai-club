@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>AI Club Hub</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👾</text></svg>">
+  <style>
+      :root {
+        --bg: #ffffff;
+        --panel: #ffffff;
+        --text: #111827;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --accent: #4285F4;
+        --accent-hover: #3367d6;
+        --tag-bg: #f3f4f6;
+        --tag-border: #e5e7eb;
+        --tag-text: #374151;
+        --radius: 12px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        overflow-x: hidden;
+        cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' style='font-size:32px'><text y='32'>👾</text></svg>") 16 16, auto;
+      }
+
+      a, button, input, select, textarea, .card, .tag {
+        cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' style='font-size:32px'><text y='32'>👾</text></svg>") 16 16, pointer !important;
+      }
+
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 80px 24px;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 80px;
+      }
+
+      h1 {
+        font-size: 6rem;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        background: linear-gradient(90deg, #4285F4, #A142F4, #EA4335, #FBBC05, #34A853);
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient-shift 6s ease infinite;
+        margin-bottom: 16px;
+        line-height: 1.05;
+      }
+
+      @keyframes gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      .subtitle {
+        font-size: 1.5rem;
+        color: var(--muted);
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+
+      .intro {
+        margin-top: 8px;
+        color: var(--muted);
+      }
+
+      .notice {
+        display: inline-block;
+        margin-top: 24px;
+        padding: 10px 20px;
+        background: #f9fafb;
+        border: 1px solid #f3f4f6;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        color: #6b7280;
+      }
+
+      .notice code {
+        color: #111827;
+        font-weight: 600;
+        background: #f3f4f6;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 40px;
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--panel);
+        overflow: hidden;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      }
+
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      .card-cover {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background-color: #f3f4f6;
+        overflow: hidden;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .card-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+
+      .card:hover .card-cover img {
+        transform: scale(1.05);
+      }
+
+      .card-content {
+        padding: 24px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card-header {
+        margin-bottom: 16px;
+      }
+
+      .card-header h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #111827;
+        margin-bottom: 4px;
+      }
+
+      .author {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .desc {
+        font-size: 0.95rem;
+        color: #4b5563;
+        margin-bottom: 24px;
+        flex: 1;
+        line-height: 1.6;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
+
+      .tag {
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 20px;
+        background-color: var(--tag-bg);
+        color: var(--tag-text);
+        border: 1px solid var(--tag-border);
+      }
+
+      .button {
+        display: inline-block;
+        text-align: center;
+        background-color: var(--accent);
+        color: white;
+        text-decoration: none;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: background-color 0.2s ease;
+      }
+
+      .button:hover {
+        background-color: var(--accent-hover);
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 100px;
+        padding-top: 40px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      
+      footer code {
+        background: #f3f4f6;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: #111827;
+      }
+
+      /* Filter Styles */
+      .filters {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 48px;
+        flex-wrap: wrap;
+      }
+
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .filter-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .filter-select {
+        padding: 8px 16px;
+        border-radius: 30px;
+        border: 1px solid var(--line);
+        background: white;
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 500;
+        outline: none;
+        transition: all 0.2s;
+        min-width: 120px;
+      }
+
+      .filter-select:hover {
+        border-color: var(--accent);
+      }
+
+      .filter-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+      }
+
+      .card.hidden {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        h1 { font-size: 3.5rem; }
+      }
+  </style>
+</head>
+<body>
+  <canvas id="particle-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none; filter: blur(3px);"></canvas></canvas>
+  
+
+  
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+  </div>
+  
+
+<main>
+<header>
+<h1>AI Club Hub</h1>
+<p class="subtitle">Meisha AI Club Projects</p>
+<p class="intro">Choose a project to explore.</p>
+
+<div class="filters">
+  <div class="filter-group">
+    <span class="filter-label">Category:</span>
+    <select id="filter-category" class="filter-select">
+      <option value="all">All Categories</option>
+      <option value="Game">Game</option>
+      <option value="Tool">Tool</option>
+      <option value="AI">AI</option>
+      <option value="Sailing">Sailing</option>
+      <option value="Backend">Backend</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Author:</span>
+    <select id="filter-author" class="filter-select">
+      <option value="all">All Authors</option>
+      <option value="AI Club">AI Club</option>
+      <option value="Cooka">Cooka</option>
+      <option value="Eric">Eric</option>
+      <option value="Albert">Albert</option>
+      <option value="Peter">Peter</option>
+      <option value="Lucy">Lucy</option>
+    </select>
+  </div>
+</div>
+
+</header>
+<section aria-label="AI Club projects" class="grid">
+        <article class="card">
+<div class="card-cover">
+<img alt="Funny Sailing 2D cover" loading="lazy" src="./covers/funny-sailing.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>Sailer 3D</h2>
+<p class="author">作者: AI Club</p>
+</div>
+<p class="desc">A playful sailing wave-dodge game for quick experiments, silly turns, and funny mechanics.</p>
+<div class="tags">
+<span class="tag">Game</span><span class="tag">Sailing</span><span class="tag">2D</span>
+</div>
+<a class="button" data-path="/public/projects/sailer-3d/index.html" href="./public/projects/sailer-3d/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Cooka Snake cover" loading="lazy" src="./covers/snake.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>Snake</h2>
+<p class="author">作者: Cooka</p>
+</div>
+<p class="desc">A simple snake game that is easy to understand, remix, and extend with new rules.</p>
+<div class="tags">
+<span class="tag">Game</span>
+</div>
+<a class="button" data-path="/public/projects/snake/index.html" href="./public/projects/snake/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Boxhead cover" loading="lazy" src="./covers/boxhead.svg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>Boxhead</h2>
+<p class="author">作者: Cooka</p>
+</div>
+<p class="desc">A 3D survival action game with local two-player controls, waves, shooting, and arena building.</p>
+<div class="tags">
+<span class="tag">Game</span><span class="tag">3D</span><span class="tag">Action</span>
+</div>
+<a class="button" data-path="/public/projects/boxhead/index.html" href="./public/projects/boxhead/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Climb 3D cover" loading="lazy" src="./covers/climb.svg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>Climb 3D</h2>
+<p class="author">作者: Cooka</p>
+</div>
+<p class="desc">A 3D climbing and parkour experiment with keyboard movement, camera control, stamina, and height goals.</p>
+<div class="tags">
+<span class="tag">Game</span><span class="tag">3D</span><span class="tag">Parkour</span>
+</div>
+<a class="button" data-path="/public/projects/climb-3d/index.html" href="./public/projects/climb-3d/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="AI Tabletop cover" loading="lazy" src="./covers/tabletop.svg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>AI Tabletop</h2>
+<p class="author">作者: Eric / AI Club</p>
+</div>
+<p class="desc">A tabletop game platform that collects Wolfcha, Undercover, and Doudizhu style AI party games.</p>
+<div class="tags">
+<span class="tag">Game</span><span class="tag">AI</span><span class="tag">Party</span>
+</div>
+<a class="button" data-path="/public/projects/ai-tabletop/index.html" href="./public/projects/ai-tabletop/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Snake.io cover" loading="lazy" src="./covers/snake-io.svg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>Snake.io</h2>
+<p class="author">作者: AI Club</p>
+</div>
+<p class="desc">A multiplayer Snake.io clone with Socket.IO networking, leaderboard, food, and live movement.</p>
+<div class="tags">
+<span class="tag">Game</span><span class="tag">Multiplayer</span><span class="tag">Backend</span>
+</div>
+<a class="button" data-path="/" data-port="5194" href="http://localhost:5194/" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Hajimi-Dan cover" loading="lazy" src="./covers/hajimi.svg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>Hajimi-Dan</h2>
+<p class="author">作者: AI Club</p>
+</div>
+<p class="desc">A student community and forum app with login, posts, check-in, profiles, and a database-backed workflow.</p>
+<div class="tags">
+<span class="tag">Community</span><span class="tag">Forum</span><span class="tag">Backend</span>
+</div>
+<a class="button" data-path="/login" data-port="5195" href="http://localhost:5195/login" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Sail Dodge cover" loading="lazy" src="./covers/sail-dodge.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>Sail Dodge</h2>
+<p class="author">作者: AI Club</p>
+</div>
+<p class="desc">A polished, low-poly arcade dodge game where you navigate waves and collect combos.</p>
+<div class="tags">
+<span class="tag">Game</span><span class="tag">Sailing</span>
+</div>
+<a class="button" data-path="/public/projects/sail-dodge/index.html" href="./public/projects/sail-dodge/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="帆船起航倒计时 cover" loading="lazy" src="./covers/countdown.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>帆船起航倒计时</h2>
+<p class="author">作者: Albert</p>
+</div>
+<p class="desc">A sailing race start countdown tool for real training and event scenarios.</p>
+<div class="tags">
+<span class="tag">Tool</span><span class="tag">Sailing</span>
+</div>
+<a class="button" data-path="/public/projects/countdown/index.html" href="./public/projects/countdown/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Peter 背单词 cover" loading="lazy" src="./covers/vocabulary.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>背单词</h2>
+<p class="author">作者: Peter</p>
+</div>
+<p class="desc">A minimal vocabulary tool and a good starter for personal learning apps.</p>
+<div class="tags">
+<span class="tag">Tool</span>
+</div>
+<a class="button" data-path="/public/projects/vocabulary/index.html" href="./public/projects/vocabulary/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="CV 点名抽签 cover" loading="lazy" src="./covers/cv-picker.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>CV 点名抽签</h2>
+<p class="author">作者: Eric</p>
+</div>
+<p class="desc">A classroom random picker demo with a camera-inspired interaction concept.</p>
+<div class="tags">
+<span class="tag">Tool</span><span class="tag">Classroom</span>
+</div>
+<a class="button" data-path="/public/projects/cv-picker/index.html" href="./public/projects/cv-picker/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Quantitative Alert System cover" loading="lazy" src="./covers/quant-panel.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>Quantitative Panel</h2>
+<p class="author">作者: AI Club</p>
+</div>
+<p class="desc">A professional quantitative monitoring and alert dashboard for analyzing market trends.</p>
+<div class="tags">
+<span class="tag">Tool</span><span class="tag">Data</span><span class="tag">Finance</span>
+</div>
+<a class="button" data-path="/" data-port="8000" href="http://localhost:8000/" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Peter Flight Radar cover" loading="lazy" src="./covers/flight-radar.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>Flight Radar</h2>
+<p class="author">作者: Peter</p>
+</div>
+<p class="desc">A map and route starter for flight, navigation, and real-world tracking ideas.</p>
+<div class="tags">
+<span class="tag">Map</span><span class="tag">Starter</span>
+</div>
+<a class="button" data-path="/public/projects/flight-radar/index.html" href="./public/projects/flight-radar/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="PROMETHEUS cover" loading="lazy" src="./covers/prometheus.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>PROMETHEUS</h2>
+<p class="author">作者: AI Club</p>
+</div>
+<p class="desc">A high-fidelity interactive terminal-style narrative engine exploring humanity, survival, and choices.</p>
+<div class="tags">
+<span class="tag">AI</span><span class="tag">Game</span><span class="tag">Narrative</span>
+</div>
+<a class="button" data-path="/" data-port="3000" href="http://localhost:3000/" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Sailer 2D cover" loading="lazy" src="./covers/sailer.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>Sailer 2D</h2>
+<p class="author">作者: AI Club</p>
+</div>
+<p class="desc">A serious 2D sailing simulator for learning wind, sail, rudder, force, and boat movement.</p>
+<div class="tags">
+<span class="tag">Sailing</span><span class="tag">2D</span><span class="tag">Simulation</span>
+</div>
+<a class="button" data-path="/" data-port="5180" href="http://localhost:5180/" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+        <article class="card">
+<div class="card-cover">
+<img alt="Lucy Grass cover" loading="lazy" src="./covers/lucy-grass.jpg"/>
+</div>
+<div class="card-content">
+<div class="card-header">
+<h2>草原梦境</h2>
+<p class="author">作者: Lucy / Eric</p>
+</div>
+<p class="desc">A small visual artwork project for exploring interactive art and atmosphere.</p>
+<div class="tags">
+<span class="tag">Visual</span><span class="tag">Art</span>
+</div>
+<a class="button" data-path="/public/projects/lucy-grass/index.html" href="./public/projects/lucy-grass/index.html" rel="noopener" target="_blank">Start!</a>
+</div>
+</article>
+
+      </section>
+<footer>
+        Same Wi-Fi access: <code>http://teacher-ip:5190/ai-club-hub/</code>. Backend projects use the unified launcher: <code>./start-ai-club-hub.sh</code>.
+      </footer>
+</main>
+
+
+
+<script>
+      const host = location.hostname || "localhost";
+      document.querySelectorAll(".button[data-path]").forEach((link) => {
+        const port = link.dataset.port || "5190";
+        const path = link.dataset.path || "/";
+        link.href = `http://${host}:${port}${encodeURI(path)}`;
+      });
+
+      // Filter Logic
+      const filterCategory = document.getElementById('filter-category');
+      const filterAuthor = document.getElementById('filter-author');
+      const cards = document.querySelectorAll('.card');
+
+      function applyFilters() {
+        const cat = filterCategory.value;
+        const auth = filterAuthor.value;
+
+        cards.forEach(card => {
+          const cardTags = Array.from(card.querySelectorAll('.tag')).map(t => t.textContent);
+          const cardAuthor = card.querySelector('.author').textContent;
+          
+          const matchCat = cat === 'all' || cardTags.includes(cat);
+          const matchAuth = auth === 'all' || cardAuthor.includes(auth);
+
+          if (matchCat && matchAuth) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      }
+
+      filterCategory.addEventListener('change', applyFilters);
+      filterAuthor.addEventListener('change', applyFilters);
+    </script>
+<script>
+  // Flat Canvas Interactive Particles
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  
+  let width, height;
+  let particles = [];
+  
+  // High-end Google Antigravity Colors
+  const colors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#A142F4', '#F442A8'];
+  
+  const mouse = { x: -1000, y: -1000, radius: 150 };
+
+  function resize() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width * window.devicePixelRatio;
+    canvas.height = height * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+  
+  window.addEventListener('resize', resize);
+  resize();
+
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  window.addEventListener('mouseout', () => {
+    mouse.x = -1000;
+    mouse.y = -1000;
+  });
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.baseSize = Math.random() * 3.5 + 2; // Flat and crisp size
+      this.size = this.baseSize;
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      
+      this.vx = (Math.random() - 0.5) * 1.5;
+      this.vy = (Math.random() - 0.5) * 1.5;
+    }
+
+    draw() {
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Wrap
+      if (this.x > width + 20) this.x = -20;
+      else if (this.x < -20) this.x = width + 20;
+      
+      if (this.y > height + 20) this.y = -20;
+      else if (this.y < -20) this.y = height + 20;
+
+      // Repel
+      let dx = mouse.x - this.x;
+      let dy = mouse.y - this.y;
+      let distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance < mouse.radius) {
+        let forceDirectionX = dx / distance;
+        let forceDirectionY = dy / distance;
+        let force = (mouse.radius - distance) / mouse.radius;
+        
+        this.vx -= forceDirectionX * force * 0.4;
+        this.vy -= forceDirectionY * force * 0.4;
+      }
+      
+      let speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+      if (speed > 1.5) {
+        this.vx *= 0.95;
+        this.vy *= 0.95;
+      } else if (speed < 0.2) {
+        this.vx += (Math.random() - 0.5) * 0.1;
+        this.vy += (Math.random() - 0.5) * 0.1;
+      }
+
+      this.draw();
+    }
+  }
+
+  function init() {
+    particles = [];
+    const numParticles = Math.min((width * height) / 8000, 200); 
+    for (let i = 0; i < numParticles; i++) {
+      particles.push(new Particle());
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+    for (let i = 0; i < particles.length; i++) {
+      particles[i].update();
+    }
+    requestAnimationFrame(animate);
+  }
+
+  init();
+  animate();
+</script>
+</body>
+</html>

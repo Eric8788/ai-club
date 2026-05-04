@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极简背单词</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --bg-color: #f5f7fa;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 { color: #333; margin-bottom: 0.5rem; }
+        .score { color: #666; font-size: 0.9rem; margin-bottom: 2rem; }
+
+        .word-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 20px 0;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        .feedback {
+            height: 24px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+
+        .correct { color: var(--success-color); }
+        .wrong { color: var(--error-color); }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="game-card">
+    <h1>📘 背单词</h1>
+    <div class="score" id="score-board">正确: 0 | 总数: 0</div>
+    
+    <div id="quiz-area">
+        <div class="word-display" id="english-word">Loading...</div>
+        <input type="text" id="answer-input" placeholder="输入中文意思" autocomplete="off">
+        <div class="feedback" id="feedback"></div>
+        <button onclick="checkAnswer()">提交 (Enter)</button>
+    </div>
+
+    <div id="result-area" class="hidden">
+        <h2>测试结束！</h2>
+        <div id="final-score" style="font-size: 1.5rem; margin: 20px 0;"></div>
+        <button onclick="resetGame()">重新开始</button>
+    </div>
+</div>
+
+<script>
+    // 1. 单词表
+    const wordsDict = {
+        "apple": "苹果",
+        "banana": "香蕉",
+        "cat": "猫",
+        "dog": "狗",
+        "book": "书",
+        "computer": "电脑"
+    };
+
+    let wordList = [];
+    let currentIndex = 0;
+    let correctCount = 0;
+    let totalCount = 0;
+
+    // 2. 初始化游戏
+    function initGame() {
+        // 将对象转换为数组并随机排序
+        wordList = Object.entries(wordsDict);
+        wordList.sort(() => Math.random() - 0.5);
+        
+        currentIndex = 0;
+        correctCount = 0;
+        totalCount = 0;
+        
+        document.getElementById('quiz-area').classList.remove('hidden');
+        document.getElementById('result-area').classList.add('hidden');
+        updateScore();
+        showNextWord();
+    }
+
+    // 3. 显示下一个单词
+    function showNextWord() {
+        if (currentIndex < wordList.length) {
+            document.getElementById('english-word').innerText = wordList[currentIndex][0];
+            document.getElementById('answer-input').value = '';
+            document.getElementById('answer-input').focus();
+            document.getElementById('feedback').innerText = '';
+        } else {
+            showFinalResult();
+        }
+    }
+
+    // 4. 检查答案
+    function checkAnswer() {
+        const inputField = document.getElementById('answer-input');
+        const userAnswer = inputField.value.trim();
+        const correctAnswer = wordList[currentIndex][1];
+        const feedback = document.getElementById('feedback');
+
+        if (userAnswer === "") return; // 防止空提交
+
+        totalCount++;
+        
+        if (userAnswer === correctAnswer) {
+            feedback.innerText = "✔ 正确！";
+            feedback.className = "feedback correct";
+            correctCount++;
+        } else {
+            feedback.innerText = `✘ 错误，正确答案是：${correctAnswer}`;
+            feedback.className = "feedback wrong";
+        }
+
+        updateScore();
+        currentIndex++;
+
+        // 延迟1.5秒进入下一个单词，让用户看清反馈
+        setTimeout(() => {
+            showNextWord();
+        }, 1200);
+    }
+
+    function updateScore() {
+        document.getElementById('score-board').innerText = `正确: ${correctCount} | 总数: ${totalCount}`;
+    }
+
+    function showFinalResult() {
+        document.getElementById('quiz-area').classList.add('hidden');
+        document.getElementById('result-area').classList.remove('hidden');
+        document.getElementById('final-score').innerText = `${correctCount} / ${totalCount} 正确`;
+    }
+
+    function resetGame() {
+        initGame();
+    }
+
+    // 监听回车键
+    document.getElementById('answer-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+
+    // 启动
+    initGame();
+</script>
+
+</body>
+</html>

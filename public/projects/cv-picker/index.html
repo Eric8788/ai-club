@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CV 点名抽签系统</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <video id="bgVideo" class="bg-video" autoplay playsinline muted></video>
+    <div class="bg-overlay"></div>
+
+    <main class="app">
+      <header class="hero glass">
+        <div>
+          <p class="eyebrow">AI Club Classroom Tool</p>
+          <h1>镜头点名抽签</h1>
+          <p class="hero-copy">打开摄像头，系统先识别画面里有几个人。老师给脸打标签后，再从已标记的人里抽签。</p>
+        </div>
+        <div class="hero-status">
+          <span class="status-pill"><span class="status-dot" id="statusDot"></span><span id="cameraStatus">相机准备中...</span></span>
+          <span class="status-pill"><span class="model-dot" id="modelDot"></span><span id="modelStatus">模型加载中...</span></span>
+        </div>
+      </header>
+
+      <section class="layout">
+        <section class="camera-panel glass">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Live Camera</p>
+              <h2>镜头扫描区</h2>
+            </div>
+            <div class="live-stats">
+              <div class="stat-chip">
+                <span class="stat-label">已标记</span>
+                <strong id="recognizedCount">0</strong>
+              </div>
+              <div class="stat-chip">
+                <span class="stat-label">当前模式</span>
+                <strong id="modeText">待机</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="camera-wrap">
+            <video id="previewVideo" autoplay playsinline muted></video>
+            <canvas id="overlayCanvas"></canvas>
+            <div class="scan-grid"></div>
+            <div class="scan-hint" id="scanHint">等待模型与摄像头...</div>
+            <div class="winner-banner" id="winnerBanner">你被选中了</div>
+          </div>
+
+          <div class="camera-footer">
+            <p id="instructionText">打开摄像头后，系统会自动检测画面中的人脸。右侧给对应的人打标签后即可抽签。</p>
+            <div class="camera-actions">
+              <button id="cameraButton" class="ghost">打开摄像头</button>
+              <button id="drawButton" class="primary" disabled>开始抽签</button>
+              <button id="resetButton" class="ghost">清除结果</button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="control-panel glass">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Live Faces</p>
+              <h2>镜头中的人</h2>
+            </div>
+            <button id="clearProfilesButton" class="ghost danger">清空标签</button>
+          </div>
+
+          <div class="enroll-box">
+            <div class="face-summary">
+              <div>
+                <span>检测到</span>
+                <strong id="visibleFaceCount">0</strong>
+              </div>
+              <div>
+                <span>可抽签</span>
+                <strong id="drawableFaceCount">0</strong>
+              </div>
+            </div>
+            <p id="enrollStatus" class="hint">让同学进入镜头后，在下面给每张脸选择名字并点击“标记”。</p>
+          </div>
+
+          <div class="student-list" id="studentList"></div>
+
+          <div class="panel-foot">
+            <div class="foot-stat">
+              <span>标签库</span>
+              <strong id="enrolledCount">0 / 7</strong>
+            </div>
+            <div class="foot-stat">
+              <span>抽签结果</span>
+              <strong id="resultText">尚未抽签</strong>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <datalist id="knownLabels"></datalist>
+    <script src="lib/face-api.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

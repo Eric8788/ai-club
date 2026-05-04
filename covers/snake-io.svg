@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="Snake.io cover">
+  <rect width="1280" height="720" fill="#052e16"/>
+  <path d="M190 430 C270 250 430 250 510 430 S750 610 830 430 S990 250 1090 390" fill="none" stroke="#22c55e" stroke-width="72" stroke-linecap="round"/>
+  <circle cx="1092" cy="390" r="58" fill="#4ade80"/>
+  <circle cx="1070" cy="372" r="8" fill="#052e16"/>
+  <circle cx="1110" cy="372" r="8" fill="#052e16"/>
+  <circle cx="280" cy="210" r="24" fill="#f97316"/>
+  <circle cx="744" cy="238" r="24" fill="#38bdf8"/>
+  <circle cx="960" cy="570" r="24" fill="#facc15"/>
+  <text x="84" y="130" fill="#ecfdf5" font-family="Arial, sans-serif" font-size="76" font-weight="800">SNAKE.IO</text>
+</svg>

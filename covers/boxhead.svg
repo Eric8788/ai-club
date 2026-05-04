@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="Boxhead cover">
+  <rect width="1280" height="720" fill="#111827"/>
+  <rect x="96" y="96" width="1088" height="528" rx="34" fill="#1f2937"/>
+  <g fill="#ef4444">
+    <rect x="190" y="214" width="154" height="154" rx="18"/>
+    <rect x="858" y="178" width="126" height="126" rx="16"/>
+    <rect x="940" y="412" width="116" height="116" rx="14"/>
+  </g>
+  <g fill="#f9fafb">
+    <circle cx="240" cy="270" r="15"/>
+    <circle cx="294" cy="270" r="15"/>
+    <rect x="230" y="318" width="74" height="14" rx="7"/>
+  </g>
+  <path d="M420 506 L760 248" stroke="#fbbf24" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="780" cy="234" r="44" fill="#fbbf24"/>
+  <text x="96" y="666" fill="#f9fafb" font-family="Arial, sans-serif" font-size="70" font-weight="800">BOXHEAD</text>
+</svg>

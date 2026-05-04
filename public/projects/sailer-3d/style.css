@@ -1,0 +1,178 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    overflow: hidden;
+    background-color: #88ccee;
+    font-family: 'Press Start 2P', monospace;
+    color: white;
+}
+
+/* Force pixelated scaling for that retro indie look */
+#game-canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+
+/* Base class for all pixel text with sharp black borders/shadows */
+.pixel-text {
+    font-family: 'Press Start 2P', monospace;
+    color: white;
+    text-shadow: 
+        2px 2px 0 #000, 
+        -2px -2px 0 #000,  
+        2px -2px 0 #000,
+        -2px 2px 0 #000;
+    letter-spacing: 2px;
+}
+
+#ui-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Let clicks pass through to game/canvas unless explicitly set */
+}
+
+.screen {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* Start / End Screens */
+#start-screen {
+    background: rgba(0,0,0,0.4);
+    pointer-events: auto; /* Catch clicks */
+}
+
+#gameover-screen {
+    background: rgba(150,0,0,0.3);
+    pointer-events: auto;
+}
+
+.pixel-title {
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-shadow: 4px 4px 0 #000;
+}
+
+/* Gameplay HUD */
+#score-display {
+    position: absolute;
+    top: 15%;
+    font-size: 20px;
+}
+
+#center-message {
+    position: absolute;
+    top: 35%;
+    font-size: 16px;
+}
+
+#warning-message {
+    position: absolute;
+    bottom: 30%;
+    font-size: 14px;
+}
+
+#bottom-info {
+    position: absolute;
+    bottom: 10%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    background: #e6b999;
+    border: 4px solid #000;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: none;
+}
+
+.info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.info-text .name {
+    font-size: 12px;
+    color: white;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+
+.info-text .status {
+    font-size: 12px;
+    color: #aaddff;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+
+/* Animations */
+.blink {
+    animation: blinker 1.5s linear infinite;
+}
+
+.warning-blink {
+    animation: fast-blinker 0.4s linear infinite;
+}
+
+@keyframes blinker {
+    50% { opacity: 0; }
+}
+
+@keyframes fast-blinker {
+    50% { opacity: 0; color: #ff5555; }
+}
+
+/* Hit Flash Overlay */
+#flash-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #ff0000;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.flash-anim {
+    animation: flash 0.3s ease-out;
+}
+
+@keyframes flash {
+    0% { opacity: 0.6; }
+    100% { opacity: 0; }
+}
+
+.screen-shake {
+    animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-4px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+    40%, 60% { transform: translate3d(8px, 0, 0); }
+}

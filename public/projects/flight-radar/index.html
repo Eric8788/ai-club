@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>✈️ Peter's Flight Radar</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 引入 Leaflet CSS (地图样式) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* 全屏地图 */
+        .info-box {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            z-index: 1000;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="info-box">
+        <h3>✈️ Live Flight Tracker</h3>
+        <p>Status: <span id="status">Scanning...</span></p>
+        <p>Planes Found: <span id="count">0</span></p>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- 引入 Leaflet JS (地图逻辑) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // 1. 初始化地图 (坐标: 上海浦东机场附近)
+        // [纬度, 经度], 缩放级别
+        var map = L.map('map').setView([31.1443, 121.8083], 10);
+
+        // 2. 添加地图图层 (这里用的是 OpenStreetMap，免费)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // 飞机小图标
+        var planeIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/786/786205.png', // 找了一个简单的飞机图标
+            iconSize: [30, 30],
+        });
+
+        // 3. 获取飞机数据的函数
+        async function fetchPlanes() {
+            document.getElementById('status').innerText = "Fetching data...";
+
+            // OpenSky Network API (免费版)
+            // 限制：这里设置了一个大概的经纬度范围 (上海周边)
+            // lamin/lomin = 最小纬度/经度, lamax/lomax = 最大纬度/经度
+            const url = 'https://opensky-network.org/api/states/all?lamin=30.0&lomin=120.0&lamax=32.0&lomax=123.0';
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // 清除旧的标记 (这里简化处理，实际项目可以优化)
+                // (为了演示简单，我们先不清除，只是不断加新的，或者你可以刷新页面)
+
+                if (data.states) {
+                    document.getElementById('count').innerText = data.states.length;
+                    document.getElementById('status').innerText = "Updated";
+
+                    data.states.forEach(plane => {
+                        // plane[6] 是纬度, plane[5] 是经度, plane[1] 是呼号
+                        if (plane[6] && plane[5]) {
+                            L.marker([plane[6], plane[5]], { icon: planeIcon })
+                                .addTo(map)
+                                .bindPopup(`<b>Flight: ${plane[1]}</b><br>Origin: ${plane[2]}<br>Speed: ${plane[9]} m/s`);
+                        }
+                    });
+                } else {
+                    document.getElementById('status').innerText = "No planes nearby";
+                }
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                document.getElementById('status').innerText = "Error (Too many requests?)";
+            }
+        }
+
+        // 4. 运行
+        fetchPlanes();
+
+        // 每 10 秒刷新一次 (注意：OpenSky 免费版限制较多，不要设太快)
+        setInterval(fetchPlanes, 10000);
+
+    </script>
+</body>
+
+</html>

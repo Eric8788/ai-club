@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D跑酷游戏 V2</title>
+  <script type="module" crossorigin src="./assets/index-HT4RtUup.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CAhbPwPp.css">
+</head>
+<body>
+    <div id="blocker" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:999; cursor:pointer; background:rgba(0,0,0,0.6); display:flex; flex-direction:column; justify-content:center; align-items:center;">
+    <h1 style="color:white; font-size:48px; margin-bottom: 20px;">🏃 跑酷游戏</h1>
+    <p style="color:white; font-size:24px; margin-bottom: 30px;">点击屏幕开始游戏</p>
+    <p style="color:#aaa; font-size:16px;">按 ESC 暂停并显示鼠标</p>
+</div>
+<div id="game-container">
+        <div id="ui">
+            <h2>🏃 跑酷游戏</h2>
+            <div class="stat-item">高度: <span id="height" class="stat-value">0</span>m</div>
+            <div class="stat-item">平台数: <span id="platforms" class="stat-value">0</span></div>
+            <div class="stat-item">最高记录: <span id="best-height" class="stat-value">0</span>m</div>
+        </div>
+        
+        <div id="choice-ui" style="display: none;">
+            <h2 style="color: white; text-align: center; margin-bottom: 30px;">做出选择</h2>
+            <div style="display: flex; gap: 20px; justify-content: center;">
+                <button id="choice-k" style="
+                    padding: 20px 40px;
+                    font-size: 18px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    transition: transform 0.2s;
+                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    🚀 开启真正的登神之路
+                </button>
+                <button id="choice-l" style="
+                    padding: 20px 40px;
+                    font-size: 18px;
+                    background: linear-gradient(135deg, #ff6b6b 0%, #c0392b 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    transition: transform 0.2s;
+                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    🌟 成为伪神
+                </button>
+            </div>
+        </div>
+        
+        <div id="controls-hint">
+            <h3>🎮 操作说明</h3>
+            <p><kbd>W</kbd> 前进</p>
+            <p><kbd>S</kbd> 后退</p>
+            <p><kbd>A</kbd> 左平移</p>
+            <p><kbd>D</kbd> 右平移</p>
+            <p><kbd>空格</kbd> 跳跃/上升（飞行模式）</p>
+            <p><kbd>Shift</kbd> 按住疾跑/下降（飞行模式）</p>
+            <p><kbd>Y</kbd> 切换飞行模式</p>
+            <p><kbd>N</kbd> 切换第一/第三人称</p>
+            <p><kbd>C</kbd> 切换创作者模式</p>
+            <p><kbd>K</kbd> 开启真正的登神之路</p>
+            <p><kbd>L</kbd> 成为伪神</p>
+            <p><kbd>鼠标滑动</kbd> 旋转视角（可上下看）</p>
+        </div>
+        
+        <div id="stamina-bar">
+            <h3>⚡ 体力</h3>
+            <div id="stamina-container">
+                <div id="stamina-fill" style="width: 100%"></div>
+            </div>
+        </div>
+        
+        <div id="game-over">
+            <h1>💀 掉落！</h1>
+            <p>达到高度: <span id="final-height">0</span>m</p>
+            <p>攀爬平台: <span id="final-platforms">0</span>个</p>
+            <button id="restart-btn">重新开始</button>
+        </div>
+    </div>
+</body>
+</html>

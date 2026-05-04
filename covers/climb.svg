@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="Climb cover">
+  <rect width="1280" height="720" fill="#eef2ff"/>
+  <circle cx="1020" cy="160" r="88" fill="#facc15"/>
+  <path d="M0 620 L270 330 L445 520 L635 230 L855 590 L1040 365 L1280 640 L1280 720 L0 720 Z" fill="#334155"/>
+  <path d="M0 650 L280 400 L445 570 L640 300 L840 630 L1040 430 L1280 670 L1280 720 L0 720 Z" fill="#64748b"/>
+  <rect x="504" y="272" width="92" height="24" rx="12" fill="#22c55e"/>
+  <rect x="662" y="390" width="110" height="24" rx="12" fill="#22c55e"/>
+  <rect x="796" y="506" width="132" height="24" rx="12" fill="#22c55e"/>
+  <circle cx="545" cy="238" r="30" fill="#2563eb"/>
+  <text x="80" y="130" fill="#0f172a" font-family="Arial, sans-serif" font-size="70" font-weight="800">CLIMB 3D</text>
+</svg>

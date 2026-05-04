@@ -1,0 +1,172 @@
+[
+  {
+    "id": "sailer-3d",
+    "title": "Sailer 3D",
+    "author": "AI Club",
+    "description": "A playful sailing wave-dodge game for quick experiments, silly turns, and funny mechanics.",
+    "tags": ["Game", "Sailing", "2D"],
+    "cover": "./covers/funny-sailing.jpg",
+    "localPath": "../HAPPY-games/index.html",
+    "type": "static"
+  },
+  {
+    "id": "snake",
+    "title": "Snake",
+    "author": "Cooka",
+    "description": "A simple snake game that is easy to understand, remix, and extend with new rules.",
+    "tags": ["Game"],
+    "cover": "./covers/snake.jpg",
+    "localPath": "../Cooka_snake.html",
+    "type": "static"
+  },
+  {
+    "id": "boxhead",
+    "title": "Boxhead",
+    "author": "Cooka",
+    "description": "A 3D survival action game with local two-player controls, waves, shooting, and arena building.",
+    "tags": ["Game", "3D", "Action"],
+    "cover": "./covers/boxhead.svg",
+    "localPath": "../coocka-game/boxhead-game/dist/",
+    "type": "static"
+  },
+  {
+    "id": "climb-3d",
+    "title": "Climb 3D",
+    "author": "Cooka",
+    "description": "A 3D climbing and parkour experiment with keyboard movement, camera control, stamina, and height goals.",
+    "tags": ["Game", "3D", "Parkour"],
+    "cover": "./covers/climb.svg",
+    "localPath": "../coocka-game/dist/",
+    "type": "static"
+  },
+  {
+    "id": "ai-tabletop",
+    "title": "AI Tabletop",
+    "author": "Eric / AI Club",
+    "description": "A tabletop game platform that collects Wolfcha, Undercover, and Doudizhu style AI party games.",
+    "tags": ["Game", "AI", "Party"],
+    "cover": "./covers/tabletop.svg",
+    "localPath": "../oe-claw/ai-undercover/dist/",
+    "type": "static"
+  },
+  {
+    "id": "snake-io",
+    "title": "Snake.io",
+    "author": "AI Club",
+    "description": "A multiplayer Snake.io clone with Socket.IO networking, leaderboard, food, and live movement.",
+    "tags": ["Game", "Multiplayer", "Backend"],
+    "cover": "./covers/snake-io.svg",
+    "port": "5194",
+    "localPath": "/",
+    "type": "dynamic",
+    "deploymentTarget": "Render/Railway"
+  },
+  {
+    "id": "hajimi-dan",
+    "title": "Hajimi-Dan",
+    "author": "AI Club",
+    "description": "A student community and forum app with login, posts, check-in, profiles, and a database-backed workflow.",
+    "tags": ["Community", "Forum", "Backend"],
+    "cover": "./covers/hajimi.svg",
+    "port": "5195",
+    "localPath": "/login",
+    "type": "dynamic",
+    "deploymentTarget": "Vercel + Postgres"
+  },
+  {
+    "id": "sail-dodge",
+    "title": "Sail Dodge",
+    "author": "AI Club",
+    "description": "A polished, low-poly arcade dodge game where you navigate waves and collect combos.",
+    "tags": ["Game", "Sailing"],
+    "cover": "./covers/sail-dodge.jpg",
+    "localPath": "../sail-dodge-dist/index.html",
+    "type": "static"
+  },
+  {
+    "id": "countdown",
+    "title": "帆船起航倒计时",
+    "author": "Albert",
+    "description": "A sailing race start countdown tool for real training and event scenarios.",
+    "tags": ["Tool", "Sailing"],
+    "cover": "./covers/countdown.jpg",
+    "localPath": "../Albert_帆船比赛起航倒计时（群发赛版）.html",
+    "type": "static"
+  },
+  {
+    "id": "vocabulary",
+    "title": "背单词",
+    "author": "Peter",
+    "description": "A minimal vocabulary tool and a good starter for personal learning apps.",
+    "tags": ["Tool"],
+    "cover": "./covers/vocabulary.jpg",
+    "localPath": "../Peter_背单词.html",
+    "type": "static"
+  },
+  {
+    "id": "cv-picker",
+    "title": "CV 点名抽签",
+    "author": "Eric",
+    "description": "A classroom random picker demo with a camera-inspired interaction concept.",
+    "tags": ["Tool", "Classroom"],
+    "cover": "./covers/cv-picker.jpg",
+    "localPath": "../2_学生项目_Student_Projects/codex-p1/index.html",
+    "type": "static"
+  },
+  {
+    "id": "quant-panel",
+    "title": "Quantitative Panel",
+    "author": "AI Club",
+    "description": "A professional quantitative monitoring and alert dashboard for analyzing market trends.",
+    "tags": ["Tool", "Data", "Finance"],
+    "cover": "./covers/quant-panel.jpg",
+    "port": "8000",
+    "localPath": "/",
+    "type": "dynamic",
+    "deploymentTarget": "Render/Railway"
+  },
+  {
+    "id": "flight-radar",
+    "title": "Flight Radar",
+    "author": "Peter",
+    "description": "A map and route starter for flight, navigation, and real-world tracking ideas.",
+    "tags": ["Map", "Starter"],
+    "cover": "./covers/flight-radar.jpg",
+    "localPath": "../社团管理_Club_Management/2_教学资源_Resources/Starters/Peter_FlightRadar/index.html",
+    "type": "static"
+  },
+  {
+    "id": "prometheus",
+    "title": "PROMETHEUS",
+    "author": "AI Club",
+    "description": "A high-fidelity interactive terminal-style narrative engine exploring humanity, survival, and choices.",
+    "tags": ["AI", "Game", "Narrative"],
+    "cover": "./covers/prometheus.jpg",
+    "port": "3000",
+    "localPath": "/",
+    "type": "dynamic",
+    "deploymentTarget": "Render/Railway"
+  },
+  {
+    "id": "sailer-2d",
+    "title": "Sailer 2D",
+    "author": "AI Club",
+    "description": "A serious 2D sailing simulator for learning wind, sail, rudder, force, and boat movement.",
+    "tags": ["Sailing", "2D", "Simulation"],
+    "cover": "./covers/sailer.jpg",
+    "port": "5180",
+    "localPath": "/",
+    "type": "dynamic",
+    "deploymentTarget": "Static Build Recommended"
+  },
+  {
+    "id": "lucy-grass",
+    "title": "草原梦境",
+    "author": "Lucy / Eric",
+    "description": "A small visual artwork project for exploring interactive art and atmosphere.",
+    "tags": ["Visual", "Art"],
+    "cover": "./covers/lucy-grass.jpg",
+    "localPath": "../Lucy_grass.html",
+    "type": "static"
+  }
+]

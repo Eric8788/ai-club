@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sailing Dodge - Retro Flat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Load Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <canvas id="game-canvas"></canvas>
+
+    <!-- UI Overlay matching the retro pixel theme -->
+    <div id="ui-container">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1 class="pixel-title">SAILING DODGE</h1>
+            <p class="pixel-text">CLICK TO START</p>
+        </div>
+
+        <!-- Gameplay HUD -->
+        <div id="hud" class="screen">
+            <div id="score-display" class="pixel-text">SCORE: <span id="score">000</span></div>
+            
+            <div id="center-message" class="pixel-text blink">PRESS [SPACE] TO DODGE!</div>
+            
+            <div id="warning-message" class="pixel-text warning-blink" style="display: none;">WAVE DETECTED!</div>
+            
+            <div id="bottom-info">
+                <div class="avatar">👨🏽</div>
+                <div class="info-text">
+                    <div class="name">Waterman</div>
+                    <div class="status">DODGE STATUS: <span id="dodge-state">READY</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameover-screen" class="screen">
+            <h1 class="pixel-title" style="color: #ff3333;">WASTED</h1>
+            <p class="pixel-text">FINAL SCORE: <span id="final-score">0</span></p>
+            <p class="pixel-text blink" style="margin-top: 40px; cursor: pointer;" onclick="window.restartGame()">CLICK TO RETRY</p>
+        </div>
+
+    </div>
+
+    <!-- Flash overlay for getting hit -->
+    <div id="flash-overlay"></div>
+
+    <script>
+        // Cache buster logic
+        var script = document.createElement('script');
+        script.src = 'game.js?v=' + new Date().getTime();
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>

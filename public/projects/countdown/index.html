@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帆船比赛起航倒计时</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 倒计时显示区域 - 上三分之二 */
+        .countdown-display {
+            height: 66.67%;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.5s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-time {
+            font-size: 18vw;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            transition: color 0.5s;
+            margin-bottom: 20px;
+        }
+
+        .countdown-label {
+            font-size: 2.5vw;
+            margin-top: 5px;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            opacity: 0.8;
+        }
+
+        /* 进度条容器 */
+        .progress-container {
+            width: 90%;
+            max-width: 1200px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin-top: 20px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2E8B57, #3CB371);
+            border-radius: 20px;
+            width: 100%;
+            transition: width 1s linear;
+            position: relative;
+        }
+
+        /* 时间标记 */
+        .time-marker {
+            position: absolute;
+            top: -35px;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .marker-flag {
+            width: 30px;
+            height: 40px;
+            background-color: #FF8C00;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 70%, 50% 100%, 0% 70%);
+            margin-bottom: 5px;
+        }
+
+        .marker-time {
+            font-size: 1rem;
+            color: #FF8C00;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* 信息提示 */
+        .message {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 3vw;
+            font-weight: bold;
+            color: #ffcc00;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            opacity: 0;
+            transform: translateY(-100px);
+            transition: all 0.5s ease;
+            z-index: 10;
+        }
+
+        .message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 操作区域 - 下三分之一 */
+        .controls {
+            height: 33.33%;
+            background-color: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .time-btn {
+            width: 140px;
+            height: 140px;
+            border-radius: 15px;
+            border: none;
+            background-color: #2d3047;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 0 #1c1e2e;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .time-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 9px 0 #1c1e2e;
+            background-color: #3a3d5d;
+        }
+
+        .time-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 0 #1c1e2e;
+        }
+
+        .time-btn .btn-label {
+            font-size: 1rem;
+            margin-top: 5px;
+            font-weight: normal;
+            opacity: 0.8;
+        }
+
+        .control-btn {
+            width: 140px;
+            height: 140px;
+            border-radius: 15px;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-btn .btn-label {
+            font-size: 1rem;
+            margin-top: 5px;
+            font-weight: normal;
+            opacity: 0.9;
+        }
+
+        #startPauseBtn {
+            background-color: #2E8B57;
+            box-shadow: 0 6px 0 #1f6b41;
+        }
+
+        #startPauseBtn:hover {
+            background-color: #3CB371;
+            box-shadow: 0 9px 0 #1f6b41;
+        }
+
+        #resetBtn {
+            background-color: #e84545;
+            box-shadow: 0 6px 0 #b93737;
+        }
+
+        #resetBtn:hover {
+            background-color: #ed5a5a;
+            box-shadow: 0 9px 0 #b93737;
+        }
+
+        .active {
+            background-color: #4a6fa5 !important;
+            box-shadow: 0 6px 0 #3a5680 !important;
+        }
+
+        /* 帆船装饰元素 */
+        .sailboat {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .flag {
+            position: absolute;
+            width: 100px;
+            height: 70px;
+            top: 20px;
+            right: 20px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1200px) {
+            .button-row {
+                gap: 15px;
+            }
+
+            .time-btn,
+            .control-btn {
+                width: 120px;
+                height: 120px;
+                font-size: 1.5rem;
+            }
+
+            .countdown-time {
+                font-size: 15vw;
+            }
+
+            .countdown-label {
+                font-size: 3vw;
+            }
+
+            .progress-container {
+                height: 30px;
+            }
+
+            .marker-time {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .button-row {
+                gap: 10px;
+            }
+
+            .time-btn,
+            .control-btn {
+                width: 100px;
+                height: 100px;
+                font-size: 1.2rem;
+            }
+
+            .countdown-time {
+                font-size: 12vw;
+            }
+
+            .countdown-label {
+                font-size: 4vw;
+            }
+
+            .progress-container {
+                height: 25px;
+                margin-top: 10px;
+            }
+
+            .marker-time {
+                font-size: 0.8rem;
+            }
+
+            .marker-flag {
+                width: 20px;
+                height: 30px;
+            }
+
+            .time-marker {
+                top: -30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 倒计时显示区域 -->
+        <div class="countdown-display" id="countdownDisplay">
+            <div class="countdown-time" id="countdownTime">10:00</div>
+            <div class="countdown-label">起航倒计时</div>
+
+            <!-- 进度条 -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+
+                <!-- 时间标记 -->
+                <div class="time-marker" style="left: 0%;">
+                    <div class="marker-flag"></div>
+                    <div class="marker-time">10:00</div>
+                </div>
+                <div class="time-marker" style="left: 50%;">
+                    <div class="marker-flag"></div>
+                    <div class="marker-time">5:00</div>
+                </div>
+                <div class="time-marker" style="left: 60%;">
+                    <div class="marker-flag"></div>
+                    <div class="marker-time">4:00</div>
+                </div>
+                <div class="time-marker" style="left: 90%;">
+                    <div class="marker-flag"></div>
+                    <div class="marker-time">1:00</div>
+                </div>
+                <div class="time-marker" style="left: 100%;">
+                    <div class="marker-flag" style="background-color: #FF4500;"></div>
+                    <div class="marker-time" style="color: #FF4500;">0:00</div>
+                </div>
+            </div>
+
+            <!-- 信息提示区域 -->
+            <div class="message" id="message"></div>
+
+            <!-- 装饰元素 -->
+            <svg class="sailboat" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 150 L150 150 L130 120 L70 120 L50 150 Z" fill="#8B7355" />
+                <path d="M100 50 L130 120 L100 100 L70 120 L100 50 Z" fill="#FFFFFF" />
+                <path d="M100 150 L100 50" stroke="#8B7355" stroke-width="4" />
+            </svg>
+
+            <svg class="flag" viewBox="0 0 100 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="80" height="50" fill="#FF0000" />
+                <rect x="10" y="25" width="80" height="20" fill="#FFFFFF" />
+                <rect x="10" y="40" width="80" height="15" fill="#0000FF" />
+                <rect x="5" y="5" width="5" height="60" fill="#8B7355" />
+            </svg>
+        </div>
+
+        <!-- 操作区域 -->
+        <div class="controls">
+            <div class="button-row">
+                <!-- 时间选择按钮 -->
+                <button class="time-btn" id="10minBtn">
+                    10:00
+                    <span class="btn-label">10分钟</span>
+                </button>
+                <button class="time-btn" id="5minBtn">
+                    5:00
+                    <span class="btn-label">5分钟</span>
+                </button>
+                <button class="time-btn" id="4minBtn">
+                    4:00
+                    <span class="btn-label">4分钟</span>
+                </button>
+                <button class="time-btn" id="1minBtn">
+                    1:00
+                    <span class="btn-label">1分钟</span>
+                </button>
+
+                <!-- 控制按钮 -->
+                <button class="control-btn" id="startPauseBtn">
+                    ▶️
+                    <span class="btn-label">开始计时</span>
+                </button>
+                <button class="control-btn" id="resetBtn">
+                    ⟳
+                    <span class="btn-label">重置</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let countdownTime = 600; // 默认10分钟，单位：秒
+        let originalTime = 600; // 原始时间
+        let countdownInterval;
+        let isPaused = true; // 初始状态为暂停
+        let isRunning = false;
+        let activeButton = null;
+
+        // 音频上下文
+        let audioCtx;
+
+        // DOM元素
+        const countdownDisplay = document.getElementById('countdownDisplay');
+        const countdownTimeElement = document.getElementById('countdownTime');
+        const progressBar = document.getElementById('progressBar');
+        const messageElement = document.getElementById('message');
+        const startPauseBtn = document.getElementById('startPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // 时间选择按钮
+        const timeButtons = {
+            '10minBtn': 600,
+            '5minBtn': 300,
+            '4minBtn': 240,
+            '1minBtn': 60
+        };
+
+        // 初始化
+        window.onload = function () {
+            document.getElementById('10minBtn').classList.add('active');
+            activeButton = document.getElementById('10minBtn');
+            updateDisplay();
+            updateProgressBar();
+
+            startPauseBtn.innerHTML = '▶️<br><span class="btn-label">开始计时</span>';
+        };
+
+        // 初始化音频上下文 (需在用户交互后调用)
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // 播放声音函数
+        // type: 'horn' (号角) 或 'beep' (滴声)
+        function playSound(type) {
+            if (!audioCtx) return;
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'horn') {
+                // 号角声：低频锯齿波
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.8);
+
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.8);
+            } else if (type === 'beep') {
+                // 滴声：高频正弦波
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'start') {
+                // 起航长鸣
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 2.0);
+
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 2.0);
+            }
+        }
+
+        // 更新进度条
+        function updateProgressBar() {
+            const totalTime = 600; // 总参考时间（为了显示比例统一，通常用最大时间或当前设定总时间）
+            // 如果想让进度条根据"当前选定的总时间"来走，可以用 originalTime
+            // 这里为了让所有模式都在一个标尺上展示，建议用 fixed scale 或者 dynamic
+            // 原代码逻辑是用 "elapsedTime / 600"，这里我们改为相对当前总时间更直观，
+            // 或者保持原样以匹配时间轴标记。考虑到有具体的分钟标记，保持统一比例比较好。
+            // 但原逻辑中 totalTime = 600 是固定的。
+
+            // 修正：实际上对于比赛，时间是倒流的。进度条应该是 "当前时间指针的位置"。
+            // 600s = Left 0%, 0s = Left 100%.
+
+            const maxTrackTime = 600; // 时间轴最左边是10分钟
+            const positionPercentage = ((maxTrackTime - countdownTime) / maxTrackTime) * 100;
+
+            // 限制范围
+            const width = Math.max(0, Math.min(100, positionPercentage));
+            progressBar.style.width = width + '%';
+        }
+
+        // 按钮事件绑定
+        for (const [btnId, seconds] of Object.entries(timeButtons)) {
+            document.getElementById(btnId).addEventListener('click', function () {
+                if (activeButton === this) return;
+
+                if (activeButton) activeButton.classList.remove('active');
+                this.classList.add('active');
+                activeButton = this;
+
+                countdownTime = seconds;
+                originalTime = seconds;
+
+                stopCountdown();
+
+                isPaused = true;
+                isRunning = false;
+                startPauseBtn.innerHTML = '▶️<br><span class="btn-label">开始计时</span>';
+
+                updateDisplay();
+                updateProgressBar();
+                resetBackground();
+                hideMessage();
+            });
+        }
+
+        startPauseBtn.addEventListener('click', function () {
+            initAudio(); // 激活音频
+
+            if (!isRunning && isPaused) {
+                startCountdown();
+                isPaused = false;
+                this.innerHTML = '⏸️<br><span class="btn-label">暂停</span>';
+            } else if (isRunning && !isPaused) {
+                pauseCountdown();
+                isPaused = true;
+                this.innerHTML = '▶️<br><span class="btn-label">继续</span>';
+            } else if (isRunning && isPaused) {
+                resumeCountdown();
+                isPaused = false;
+                this.innerHTML = '⏸️<br><span class="btn-label">暂停</span>';
+            }
+        });
+
+        resetBtn.addEventListener('click', function () {
+            for (const [btnId, seconds] of Object.entries(timeButtons)) {
+                if (document.getElementById(btnId) === activeButton) {
+                    countdownTime = seconds;
+                    originalTime = seconds;
+                    break;
+                }
+            }
+            stopCountdown();
+            isPaused = true;
+            isRunning = false;
+            startPauseBtn.innerHTML = '▶️<br><span class="btn-label">开始计时</span>';
+            updateDisplay();
+            updateProgressBar();
+            resetBackground();
+            hideMessage();
+        });
+
+        function startCountdown() {
+            if (isRunning) return;
+            isRunning = true;
+            isPaused = false;
+
+            clearInterval(countdownInterval);
+            // 立即执行一次检查（不扣减时间，只检查状态）
+            processTimerTick(false);
+
+            countdownInterval = setInterval(() => {
+                processTimerTick(true);
+            }, 1000);
+
+            // 播放开始音效（如果是刚开始）
+            if (countdownTime === originalTime) {
+                playCorrectSoundForTime(countdownTime);
+            }
+        }
+
+        // 核心计时处理函数
+        // decrease: 是否扣减时间
+        function processTimerTick(decrease) {
+            if (isPaused) return;
+
+            if (decrease) {
+                countdownTime--;
+            }
+
+            updateDisplay();
+            updateProgressBar();
+
+            // 倒计时结束
+            if (countdownTime < 0) {
+                stopCountdown();
+                countdownTime = 0;
+                updateDisplay();
+                countdownTimeElement.style.color = "#FF0000";
+                showMessage("起航！");
+                playSound('start');
+                return;
+            }
+
+            // 处理声音和特殊时刻
+            if (decrease) { // 只在时间变化时触发声音
+                playCorrectSoundForTime(countdownTime);
+            }
+
+            // 处理颜色
+            if (countdownTime <= 20) {
+                countdownTimeElement.style.color = "#00ccff";
+            } else {
+                countdownTimeElement.style.color = "#ffffff";
+            }
+
+            // 处理消息
+            checkMessages();
+
+            // 处理闪烁 (现在每秒检查一次，不需要额外的定时器)
+            checkFlashLogic();
+        }
+
+        // 根据时间播放对应声音
+        function playCorrectSoundForTime(time) {
+            // 关键分钟节点：10, 5, 4, 1 分钟
+            if (time === 600 || time === 300 || time === 240 || time === 60) {
+                playSound('horn');
+            }
+            // 最后10秒倒数，以及主要时间的最后5秒倒数（可选）
+            else if (time <= 10 && time > 0) {
+                playSound('beep');
+            }
+            // 也可以给由分钟变秒的过程加声音，比如 1:00 前的 3-2-1
+        }
+
+        function checkMessages() {
+            if (countdownTime === 240 && originalTime >= 240) showMessage("规则旗已经升起，请留意起航规则");
+            if (countdownTime === 300) showMessage("级别旗已经升起，请注意起航级别");
+            if (countdownTime === 120) showMessage("注意海上风向和阵风变化，及时做出航线调整");
+            if (countdownTime === 90) showMessage("所剩起航时间不多，请留意起航位置");
+        }
+
+        // 闪烁逻辑控制
+        // 我们不使用单独的 interval，而是利用 currentTime + 取模 来决定是否闪烁
+        // 或者简单点：每秒 tick 时，如果满足条件就闪一下
+        // 但是"闪烁频率"意味着闪的快慢。
+        // 为了视觉效果，我们可以在 CSS class 上做文章，或者在 tick 里触发。
+        // 如果想要"每30秒闪一次"，那么 time % 30 === 0 即可。
+        function checkFlashLogic() {
+            let shouldFlash = false;
+
+            // 规则：
+            // > 2分钟: 每30秒闪
+            // 1-2分钟: 每20秒闪
+            // < 1分钟: 每10秒闪
+
+            if (countdownTime > 120) {
+                if (countdownTime % 30 === 0) shouldFlash = true;
+            } else if (countdownTime > 60) {
+                if (countdownTime % 20 === 0) shouldFlash = true;
+            } else if (countdownTime > 0) {
+                if (countdownTime % 10 === 0) shouldFlash = true;
+            }
+
+            if (shouldFlash) {
+                flashRed();
+            }
+        }
+
+        function pauseCountdown() {
+            clearInterval(countdownInterval);
+            isPaused = true;
+        }
+
+        function resumeCountdown() {
+            if (!isRunning || !isPaused) return;
+            isPaused = false;
+            countdownInterval = setInterval(() => {
+                processTimerTick(true);
+            }, 1000);
+        }
+
+        function stopCountdown() {
+            clearInterval(countdownInterval);
+            isRunning = false;
+            isPaused = true;
+        }
+
+        function updateDisplay() {
+            // 防止负数
+            const t = Math.max(0, countdownTime);
+            const minutes = Math.floor(t / 60);
+            const seconds = t % 60;
+            countdownTimeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function flashRed() {
+            const originalBg = window.getComputedStyle(countdownDisplay).backgroundColor;
+            countdownDisplay.style.backgroundColor = "#ff0000";
+            setTimeout(() => {
+                countdownDisplay.style.backgroundColor = ""; // 恢复 CSS 定义的颜色
+            }, 500);
+        }
+
+        function resetBackground() {
+            countdownDisplay.style.backgroundColor = "";
+            countdownTimeElement.style.color = "#ffffff";
+        }
+
+        function showMessage(text) {
+            messageElement.textContent = text;
+            messageElement.classList.add('show');
+            setTimeout(hideMessage, 5000);
+        }
+
+        function hideMessage() {
+            messageElement.classList.remove('show');
+        }
+    </script>
+</body>
+
+</html>

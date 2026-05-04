@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cooka Snake</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #101418;
+        color: #f5f7fb;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .game {
+        width: min(92vw, 520px);
+        display: grid;
+        gap: 14px;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 12px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 32px;
+        letter-spacing: 0;
+      }
+
+      .score {
+        color: #7ee787;
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      canvas {
+        width: 100%;
+        aspect-ratio: 1;
+        display: block;
+        border: 2px solid #2f8f46;
+        border-radius: 8px;
+        background: #050807;
+      }
+
+      .hint {
+        margin: 0;
+        color: #a8b3c7;
+        line-height: 1.5;
+      }
+
+      button {
+        min-height: 42px;
+        border: 0;
+        border-radius: 7px;
+        background: #1f6feb;
+        color: white;
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="game">
+      <header>
+        <div>
+          <h1>Cooka Snake</h1>
+          <p class="hint">Use arrow keys or WASD. Avoid walls and yourself.</p>
+        </div>
+        <div class="score">Score: <span id="score">0</span></div>
+      </header>
+
+      <canvas id="board" width="420" height="420" aria-label="Snake game board"></canvas>
+      <button id="restart" type="button">Restart</button>
+    </main>
+
+    <script>
+      const canvas = document.getElementById("board");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const restartButton = document.getElementById("restart");
+
+      const gridSize = 21;
+      const cellSize = canvas.width / gridSize;
+      let snake;
+      let food;
+      let direction;
+      let nextDirection;
+      let score;
+      let gameOver;
+
+      function reset() {
+        snake = [
+          { x: 10, y: 10 },
+          { x: 9, y: 10 },
+          { x: 8, y: 10 },
+        ];
+        direction = { x: 1, y: 0 };
+        nextDirection = { x: 1, y: 0 };
+        score = 0;
+        gameOver = false;
+        food = createFood();
+        scoreEl.textContent = score;
+        draw();
+      }
+
+      function createFood() {
+        while (true) {
+          const candidate = {
+            x: Math.floor(Math.random() * gridSize),
+            y: Math.floor(Math.random() * gridSize),
+          };
+          if (!snake.some((part) => part.x === candidate.x && part.y === candidate.y)) {
+            return candidate;
+          }
+        }
+      }
+
+      function update() {
+        if (gameOver) return;
+        direction = nextDirection;
+
+        const head = {
+          x: snake[0].x + direction.x,
+          y: snake[0].y + direction.y,
+        };
+
+        const hitWall = head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize;
+        const hitSelf = snake.some((part) => part.x === head.x && part.y === head.y);
+
+        if (hitWall || hitSelf) {
+          gameOver = true;
+          draw();
+          return;
+        }
+
+        snake.unshift(head);
+
+        if (head.x === food.x && head.y === food.y) {
+          score += 1;
+          scoreEl.textContent = score;
+          food = createFood();
+        } else {
+          snake.pop();
+        }
+
+        draw();
+      }
+
+      function drawCell(x, y, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x * cellSize + 1, y * cellSize + 1, cellSize - 2, cellSize - 2);
+      }
+
+      function draw() {
+        ctx.fillStyle = "#050807";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        drawCell(food.x, food.y, "#ff5f5f");
+        snake.forEach((part, index) => drawCell(part.x, part.y, index === 0 ? "#7ee787" : "#2f8f46"));
+
+        if (gameOver) {
+          ctx.fillStyle = "rgba(0, 0, 0, 0.68)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 34px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 8);
+          ctx.font = "18px sans-serif";
+          ctx.fillText("Press Restart or Space", canvas.width / 2, canvas.height / 2 + 28);
+        }
+      }
+
+      function setDirection(x, y) {
+        if (direction.x + x === 0 && direction.y + y === 0) return;
+        nextDirection = { x, y };
+      }
+
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") setDirection(0, -1);
+        if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") setDirection(0, 1);
+        if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") setDirection(-1, 0);
+        if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") setDirection(1, 0);
+        if (event.code === "Space" && gameOver) reset();
+      });
+
+      restartButton.addEventListener("click", reset);
+
+      reset();
+      setInterval(update, 120);
+    </script>
+  </body>
+</html>
