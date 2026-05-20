@@ -36,7 +36,7 @@
     "description": "A 3D climbing and parkour experiment with keyboard movement, camera control, stamina, and height goals.",
     "tags": ["Game", "3D", "Parkour"],
     "cover": "./covers/climb.svg",
-    "localPath": "../coocka-game/dist/",
+    "localPath": "../coocka-game/climb_2.html",
     "type": "static"
   },
   {

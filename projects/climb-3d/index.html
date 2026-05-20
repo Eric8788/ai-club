@@ -3,9 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D跑酷游戏 V2</title>
-  <script type="module" crossorigin src="./assets/index-HT4RtUup.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CAhbPwPp.css">
+    <title>3D跑酷游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: #1a1a2e;
+        }
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 100;
+            min-width: 250px;
+        }
+
+        #ui h2 {
+            margin-bottom: 15px;
+            color: #4ecca3;
+        }
+
+        .stat-item {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .stat-value {
+            color: #4ecca3;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        #controls-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 100;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        #controls-hint.minimized {
+            padding: 5px 20px;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        #controls-hint.minimized h3, #controls-hint.minimized p {
+            display: none;
+        }
+
+        #controls-hint h3 {
+            margin-bottom: 10px;
+            color: #4ecca3;
+        }
+
+        #controls-hint p {
+            margin-bottom: 5px;
+        }
+
+        #controls-hint kbd {
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-right: 5px;
+        }
+
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            z-index: 200;
+            display: none;
+        }
+
+        #game-over h1 {
+            color: #e94560;
+            margin-bottom: 20px;
+        }
+
+        #game-over p {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        #restart-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: #4ecca3;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #restart-btn:hover {
+            background: #3db892;
+        }
+
+        #stamina-bar {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 100;
+            text-align: center;
+        }
+
+        #timer {
+            position: absolute;
+            bottom: 60px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 100;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #stamina-bar h3 {
+            margin-bottom: 10px;
+            color: #ffd93d;
+        }
+
+        #stamina-container {
+            width: 200px;
+            height: 20px;
+            background: #16213e;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #stamina-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd93d, #ff6b6b);
+            transition: width 0.1s;
+        }
+    </style>
 </head>
 <body>
     <div id="blocker" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:999; cursor:pointer; background:rgba(0,0,0,0.6); display:flex; flex-direction:column; justify-content:center; align-items:center;">
@@ -16,11 +187,12 @@
 <div id="game-container">
         <div id="ui">
             <h2>🏃 跑酷游戏</h2>
+            <div id="timer">00:00</div>
             <div class="stat-item">高度: <span id="height" class="stat-value">0</span>m</div>
             <div class="stat-item">平台数: <span id="platforms" class="stat-value">0</span></div>
             <div class="stat-item">最高记录: <span id="best-height" class="stat-value">0</span>m</div>
         </div>
-        
+
         <div id="choice-ui" style="display: none;">
             <h2 style="color: white; text-align: center; margin-bottom: 30px;">做出选择</h2>
             <div style="display: flex; gap: 20px; justify-content: center;">
@@ -52,7 +224,7 @@
                 </button>
             </div>
         </div>
-        
+
         <div id="controls-hint">
             <h3>🎮 操作说明</h3>
             <p><kbd>W</kbd> 前进</p>
@@ -63,25 +235,1813 @@
             <p><kbd>Shift</kbd> 按住疾跑/下降（飞行模式）</p>
             <p><kbd>Y</kbd> 切换飞行模式</p>
             <p><kbd>N</kbd> 切换第一/第三人称</p>
-            <p><kbd>C</kbd> 切换创作者模式</p>
-            <p><kbd>K</kbd> 开启真正的登神之路</p>
-            <p><kbd>L</kbd> 成为伪神</p>
-            <p><kbd>鼠标滑动</kbd> 旋转视角（可上下看）</p>
+            <p><kbd>P</kbd> 打开/关闭成就列表</p>
+            <p><kbd>Tab</kbd> 切换操作提示显示状态</p>
+            <p><kbd>鼠标滑动</kbd> 旋转视角</p>
         </div>
-        
+
         <div id="stamina-bar">
             <h3>⚡ 体力</h3>
             <div id="stamina-container">
                 <div id="stamina-fill" style="width: 100%"></div>
             </div>
         </div>
-        
+
         <div id="game-over">
             <h1>💀 掉落！</h1>
             <p>达到高度: <span id="final-height">0</span>m</p>
             <p>攀爬平台: <span id="final-platforms">0</span>个</p>
+            <button id="respawn-btn" style="display: none; margin-top: 10px; padding: 12px 30px; background: #4ecca3; color: #1a1a2e; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">📍 在复活点复活</button>
             <button id="restart-btn">重新开始</button>
         </div>
+
+        <div id="achievements-ui" style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); z-index: 200;">
+            <div style="padding: 20px; background: rgba(30, 30, 50, 0.9); border-bottom: 2px solid #4ecca3;">
+                <h2 style="color: #4ecca3; margin: 0; font-size: 24px;">🏆 成就</h2>
+            </div>
+            <div id="achievements-list" style="flex: 1; padding: 20px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;"></div>
+            <div style="padding: 20px; background: rgba(30, 30, 50, 0.9); border-top: 2px solid #4ecca3; text-align: center;">
+                <p style="color: #ccc; margin-bottom: 10px;">按 P 键关闭</p>
+                <button id="close-achievements" style="padding: 8px 20px; background: #4ecca3; color: #1a1a2e; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.3s;">关闭</button>
+            </div>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script>
+        // 检查Three.js是否加载成功
+        if (typeof THREE === 'undefined') {
+            alert('Three.js 加载失败，请检查网络连接！');
+        }
+
+        // 游戏状态
+        let gameState = {
+            player: null,
+            playerVelocity: { x: 0, y: 0, z: 0 },
+            playerSpeed: 0,
+            currentHeight: 0,
+            platformCount: 0,
+            bestHeight: 0,
+            isPlaying: false,
+            stamina: 100,
+            isSprinting: false,
+            isGrounded: false,
+            canJump: true,
+            jumpCooldown: 0,
+            platforms: [],
+            cameraAngle: 0,
+            cameraVertical: 0.3,
+            cameraMode: 'thirdperson',
+            keys: {
+                w: false,
+                a: false,
+                s: false,
+                d: false,
+                space: false,
+                shift: false,
+                y: false,
+                n: false,
+                k: false,
+                l: false,
+                c: false
+            },
+            mouseDown: false,
+            lastMouseX: 0,
+            lastMouseY: 0,
+            maxHeight: 500,
+            achievements: {
+                初窥门径: false,
+                这里风景不错: false,
+                登峰造极: false,
+                越界者: false,
+                请为坠落的人类命名: false,
+                作弊者: false,
+                真正的神明: false,
+                新世界: false,
+                伪神: false,
+                突破上限: false,
+                宇航员: false,
+                隐藏的密钥: false,
+                旧时代的馈赠: false,
+                哈斯塔: false,
+                神农尝百草: false,
+                为什么会变成这样呢: false,
+                信标救命: false
+            },
+            fallStartHeight: 0,
+            isFalling: false,
+            isFlying: false,
+            isCreator: false,
+            showChoice: false,
+            hasMadeChoice: false,
+            hasJumpBoost: false,
+            hasScheduledTrueGodAchievement: false,
+            activeEffects: {
+                speedBoost: null,
+                jumpBoost: null,
+                flight: null,
+                speedSlow: null,
+                jumpShort: null
+            },
+            collectedFoodTypes: new Set(),
+            gameStartTime: Date.now(),
+            pausedTime: 0,
+            controlsHintMinimized: false,
+            hasRespawnPointItem: false,
+            respawnPointPlaced: false,
+            respawnPointPosition: null,
+            gKeyUseCount: 0
+        };
+
+        // 玩家参数
+        const playerConfig = {
+            walkSpeed: 0.15,
+            sprintSpeed: 0.22,
+            jumpForce: 0.4,
+            gravity: 0.006,
+            friction: 0.95,
+            airFriction: 0.998,
+            staminaDrain: 0.5,
+            staminaRegen: 0.3,
+            playerRadius: 0.5,
+            playerHeight: 1.8
+        };
+
+        // Three.js 基础设置
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87ceeb);
+        scene.fog = new THREE.Fog(0x87ceeb, 50, 200);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, 10);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.domElement.style.display = 'block';
+        renderer.domElement.style.width = '100%';
+        renderer.domElement.style.height = '100%';
+        renderer.domElement.style.position = 'absolute';
+        renderer.domElement.style.top = '0';
+        renderer.domElement.style.left = '0';
+        document.getElementById('game-container').appendChild(renderer.domElement);
+
+        // 灯光
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(50, 100, 50);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        directionalLight.shadow.camera.near = 0.5;
+        directionalLight.shadow.camera.far = 500;
+        directionalLight.shadow.camera.left = -100;
+        directionalLight.shadow.camera.right = 100;
+        directionalLight.shadow.camera.top = 100;
+        directionalLight.shadow.camera.bottom = -100;
+        scene.add(directionalLight);
+
+        // 添加点光源照亮钥匙
+        const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+        pointLight.position.set(0, 5, -200);
+        scene.add(pointLight);
+
+        // 地面
+        const groundGeometry = new THREE.PlaneGeometry(200, 200);
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            color: 0x90EE90,
+            roughness: 0.8,
+            metalness: 0.2
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.5;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // 创建玩家
+        function createPlayer() {
+            const playerGroup = new THREE.Group();
+
+            // 身体 - 使用圆柱体替代胶囊体
+            const bodyGeometry = new THREE.CylinderGeometry(0.4, 0.4, 1.2, 16);
+            const bodyMaterial = new THREE.MeshStandardMaterial({
+                color: 0x4ecca3,
+                roughness: 0.3,
+                metalness: 0.7
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = -0.3;
+            body.castShadow = true;
+            playerGroup.add(body);
+
+            // 头部
+            const headGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+            const headMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffdbac,
+                roughness: 0.5,
+                metalness: 0.3
+            });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            head.position.y = 0.5;
+            head.castShadow = true;
+            playerGroup.add(head);
+
+            playerGroup.position.set(0, 1, 0);
+            scene.add(playerGroup);
+
+            return playerGroup;
+        }
+
+        // 创建平台
+        function createPlatform(x, y, z, width, depth, height = 0.5) {
+            const platformGeometry = new THREE.BoxGeometry(width, height, depth);
+            const colors = [0x4ecca3, 0xe94560, 0xffd93d, 0x6c5ce7, 0x00cec9];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            const platformMaterial = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.6,
+                metalness: 0.4
+            });
+
+            const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+            platform.position.set(x, y, z);
+            platform.castShadow = true;
+            platform.receiveShadow = true;
+            platform.userData = {
+                type: 'platform',
+                width: width,
+                depth: depth,
+                height: height
+            };
+
+            // 添加边框
+            const edges = new THREE.EdgesGeometry(platformGeometry);
+            const lineMaterial = new THREE.LineBasicMaterial({ color: 0x333333, linewidth: 2 });
+            const wireframe = new THREE.LineSegments(edges, lineMaterial);
+            platform.add(wireframe);
+
+            scene.add(platform);
+            gameState.platforms.push(platform);
+
+            return platform;
+        }
+
+        // 创建初始平台
+        function createInitialPlatforms() {
+            // 主世界：从一开始就生成所有平台到最高高度
+            const platformCount = 250;
+            const heightInterval = Math.min(10, gameState.maxHeight / platformCount);
+
+            console.log('主世界平台数量:', platformCount);
+            console.log('主世界高度间隔:', heightInterval);
+
+            for (let i = 0; i < platformCount; i++) {
+                const height = i * heightInterval;
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 8 + Math.random() * 5;
+
+                const x = Math.cos(angle) * distance;
+                const z = Math.sin(angle) * distance;
+
+                // 平台大小随高度增加而减少
+                const size = Math.max(1.5, 3 - (height / gameState.maxHeight) * 1.5);
+
+                createPlatform(x, height, z, size, size, 0.5);
+            }
+
+            // 放置隐藏钥匙
+            createKey(0, 1, 200);
+
+            // 在主世界生成食物（每种5个）
+            const foodTypes = ['lightning', 'bounce', 'flight', 'slow', 'short'];
+            const platforms = gameState.platforms.filter(p => p.userData && p.userData.type === 'platform');
+
+            foodTypes.forEach(foodType => {
+                for (let i = 0; i < 2; i++) {
+                    const randomPlatform = platforms[Math.floor(Math.random() * platforms.length)];
+                    if (randomPlatform) {
+                        const offsetX = (Math.random() - 0.5) * 3;
+                        const offsetZ = (Math.random() - 0.5) * 3;
+                        createFood(
+                            randomPlatform.position.x + offsetX,
+                            randomPlatform.position.y + 0.5,
+                            randomPlatform.position.z + offsetZ,
+                            foodType
+                        );
+                    }
+                }
+            });
+        }
+
+        function createKey(x, y, z) {
+            const keyGeo = new THREE.TorusGeometry(0.4, 0.15, 8, 16);
+            const keyMat = new THREE.MeshStandardMaterial({
+                color: 0xffd700, emissive: 0xffaa00,
+                roughness: 0.2, metalness: 1.0
+            });
+            const keyMesh = new THREE.Mesh(keyGeo, keyMat);
+            keyMesh.position.set(x, y, z);
+
+            const pl = new THREE.PointLight(0xffa500, 1, 5);
+            keyMesh.add(pl);
+
+            keyMesh.userData = { type: 'key' };
+            scene.add(keyMesh);
+            gameState.platforms.push(keyMesh);
+            return keyMesh;
+        }
+
+        function createTreasureChest(x, y, z) {
+            const chestGroup = new THREE.Group();
+
+            const boxGeo = new THREE.BoxGeometry(1.2, 0.8, 0.8);
+            const boxMat = new THREE.MeshStandardMaterial({
+                color: 0x8B4513,
+                roughness: 0.7,
+                metalness: 0.3
+            });
+            const box = new THREE.Mesh(boxGeo, boxMat);
+            box.position.y = 0.4;
+            box.castShadow = true;
+            chestGroup.add(box);
+
+            const lidGeo = new THREE.BoxGeometry(1.25, 0.15, 0.85);
+            const lidMat = new THREE.MeshStandardMaterial({
+                color: 0x654321,
+                roughness: 0.7,
+                metalness: 0.3
+            });
+            const lid = new THREE.Mesh(lidGeo, lidMat);
+            lid.position.y = 0.8;
+            lid.position.z = 0.05;
+            lid.rotation.x = -Math.PI / 6;
+            lid.castShadow = true;
+            chestGroup.add(lid);
+
+            const lockGeo = new THREE.SphereGeometry(0.08, 8, 8);
+            const lockMat = new THREE.MeshStandardMaterial({
+                color: 0xFFD700,
+                roughness: 0.2,
+                metalness: 1.0
+            });
+            const lock = new THREE.Mesh(lockGeo, lockMat);
+            lock.position.set(0, 0.4, 0.4);
+            chestGroup.add(lock);
+
+            const pl = new THREE.PointLight(0xFFD700, 0.5, 8);
+            pl.position.set(0, 1, 0);
+            chestGroup.add(pl);
+
+            chestGroup.position.set(x, y, z);
+            chestGroup.userData = { type: 'chest', isOpened: false };
+            scene.add(chestGroup);
+            gameState.platforms.push(chestGroup);
+            return chestGroup;
+        }
+
+        function createFood(x, y, z, type) {
+            const foodGroup = new THREE.Group();
+
+            let color, size, emissive;
+            switch(type) {
+                case 'lightning':
+                    color = 0xFFFF00;
+                    emissive = 0xFFAA00;
+                    size = 0.3;
+                    break;
+                case 'bounce':
+                    color = 0x00FF00;
+                    emissive = 0x00AA00;
+                    size = 0.3;
+                    break;
+                case 'flight':
+                    color = 0x00FFFF;
+                    emissive = 0x00AAAA;
+                    size = 0.35;
+                    break;
+                case 'slow':
+                    color = 0xFF00FF;
+                    emissive = 0xAA00AA;
+                    size = 0.3;
+                    break;
+                case 'short':
+                    color = 0xFF6600;
+                    emissive = 0xAA4400;
+                    size = 0.3;
+                    break;
+            }
+
+            const foodGeo = new THREE.SphereGeometry(size, 16, 16);
+            const foodMat = new THREE.MeshStandardMaterial({
+                color: color,
+                emissive: emissive,
+                roughness: 0.2,
+                metalness: 0.8
+            });
+            const foodMesh = new THREE.Mesh(foodGeo, foodMat);
+            foodMesh.position.y = 0.4;
+            foodMesh.castShadow = true;
+            foodGroup.add(foodMesh);
+
+            const pl = new THREE.PointLight(color, 0.5, 3);
+            pl.position.y = 0.5;
+            foodGroup.add(pl);
+
+            foodGroup.position.set(x, y, z);
+            foodGroup.userData = { type: 'food', foodType: type };
+            scene.add(foodGroup);
+            gameState.platforms.push(foodGroup);
+            return foodGroup;
+        }
+
+        function checkHorizontalCollision(player, proposedX, proposedZ) {
+            const playerRadius = playerConfig.playerRadius || 0.4;
+            for (const platform of gameState.platforms) {
+                if (platform.userData.type === 'key') continue;
+                if (platform.userData.type === 'chest') continue;
+
+                const platformTop = platform.position.y + platform.userData.height / 2;
+                const platformBottom = platform.position.y - platform.userData.height / 2;
+
+                const playerBottom = player.position.y - 0.8;
+                const playerTop = player.position.y + 0.8;
+
+                if (playerBottom < platformTop && playerTop > platformBottom) {
+                    const dx = proposedX - platform.position.x;
+                    const dz = proposedZ - platform.position.z;
+                    const halfWidth = platform.userData.width / 2;
+                    const halfDepth = platform.userData.depth / 2;
+
+                    if (Math.abs(dx) < halfWidth + playerRadius && Math.abs(dz) < halfDepth + playerRadius) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // 生成新平台
+        function generateNewPlatform() {
+            const highestPlatform = gameState.platforms.reduce((highest, platform) => {
+                return platform.position.y > highest ? platform.position.y : highest;
+            }, 0);
+
+            // 如果已经达到最高高度，不再生成新平台
+            if (highestPlatform >= gameState.maxHeight) {
+                return;
+            }
+
+            const newHeight = highestPlatform + 2 + Math.random() * 3;
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 8 + Math.random() * 5;
+
+            const x = Math.cos(angle) * distance;
+            const z = Math.sin(angle) * distance;
+
+            const width = 2 + Math.random() * 3;
+            const depth = 2 + Math.random() * 3;
+
+            createPlatform(x, newHeight, z, width, depth);
+
+            // 随机生成额外平台
+            if (Math.random() > 0.5) {
+                const extraAngle = angle + (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 3 + Math.random() * 0.5);
+                const extraX = Math.cos(extraAngle) * (distance + 3 + Math.random() * 3);
+                const extraZ = Math.sin(extraAngle) * (distance + 3 + Math.random() * 3);
+                const extraWidth = 2 + Math.random() * 2;
+                const extraDepth = 2 + Math.random() * 2;
+
+                createPlatform(extraX, newHeight + Math.random() * 2, extraZ, extraWidth, extraDepth);
+            }
+        }
+
+        // 碰撞检测
+        function checkPlatformCollision(player, platform) {
+            const playerBox = new THREE.Box3().setFromObject(player);
+            const platformBox = new THREE.Box3().setFromObject(platform);
+
+            // 扩展平台碰撞箱，使其更容易攀爬
+            const expandedBox = platformBox.clone();
+            expandedBox.expandByScalar(0.3);
+            expandedBox.min.y -= 0.5;
+            expandedBox.max.y += 0.5;
+
+            return playerBox.intersectsBox(expandedBox);
+        }
+
+        // 检查玩家是否在平台上
+        function checkIfOnPlatform(player) {
+            gameState.isGrounded = false;
+
+            for (const platform of gameState.platforms) {
+                const playerBox = new THREE.Box3().setFromObject(player);
+                const platformBox = new THREE.Box3().setFromObject(platform);
+
+                const playerBottom = player.position.y - 0.9;
+                const playerTop = player.position.y + 0.8;
+                const platformTop = platform.position.y + platform.userData.height / 2;
+                const platformBottom = platform.position.y - platform.userData.height / 2;
+
+                // 检查玩家是否在平台水平范围内
+                const dx = player.position.x - platform.position.x;
+                const dz = player.position.z - platform.position.z;
+                const halfWidth = platform.userData.width / 2;
+                const halfDepth = platform.userData.depth / 2;
+
+                if (Math.abs(dx) <= halfWidth + 0.3 && Math.abs(dz) <= halfDepth + 0.3) {
+                    // 玩家在平台水平范围内
+
+                    // 情况1：玩家从上方落下，踩到平台
+                    if (playerBottom <= platformTop + 0.5 && playerBottom >= platformTop - 0.5) {
+                        if (gameState.playerVelocity.y <= 0) {
+                            // 玩家向下移动，踩到平台
+                            gameState.isGrounded = true;
+                            player.position.y = platformTop + 0.9;
+                            gameState.playerVelocity.y = 0;
+
+                            // 停止坠落状态
+                            gameState.isFalling = false;
+                            gameState.fallStartHeight = 0;
+
+                            // 更新平台计数
+                            const platformIndex = gameState.platforms.indexOf(platform);
+                            if (platformIndex >= gameState.platformCount) {
+                                gameState.platformCount = platformIndex + 1;
+                            }
+
+                            return true;
+                        }
+                    } else if (playerTop >= platformBottom - 0.5 && playerTop <= platformBottom + 0.5) {
+                        // 情况2：玩家从下方跳起，撞到平台底部
+                        if (gameState.playerVelocity.y > 0) {
+                            player.position.y = platformBottom - 0.9;
+                            gameState.playerVelocity.y = -0.1; // 撞头后轻微反弹向下
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            // 检查地面
+            if (player.position.y <= 1) {
+                // 在重置坠落高度前检查成就
+                if (gameState.fallStartHeight >= 250 && !gameState.achievements.请为坠落的人类命名 && !gameState.achievements.作弊者 && !gameState.achievements.伪神) {
+                    gameState.achievements.请为坠落的人类命名 = true;
+                    showAchievement('💀 请为坠落的人类命名', '单次坠落高度大于250米！');
+                }
+
+                gameState.isGrounded = true;
+                player.position.y = 1;
+                gameState.playerVelocity.y = 0;
+
+                // 停止坠落状态
+                gameState.isFalling = false;
+                gameState.fallStartHeight = 0;
+
+                return true;
+            }
+
+            // 玩家不在任何平台上，开始坠落
+            if (!gameState.isFalling && gameState.playerVelocity.y < 0) {
+                gameState.isFalling = true;
+                // 如果当前高度大于已记录的坠落起点，更新它
+                if (gameState.currentHeight > gameState.fallStartHeight) {
+                    gameState.fallStartHeight = gameState.currentHeight;
+                }
+            }
+
+            return false;
+        }
+
+        // 检查是否拾取食物
+        function checkFoodPickup() {
+            if (!gameState.player) return;
+
+            for (let i = gameState.platforms.length - 1; i >= 0; i--) {
+                const platform = gameState.platforms[i];
+                if (platform.userData && platform.userData.type === 'food') {
+                    const dx = gameState.player.position.x - platform.position.x;
+                    const dz = gameState.player.position.z - platform.position.z;
+                    const dy = gameState.player.position.y - platform.position.y;
+                    const horizontalDistance = Math.sqrt(dx * dx + dz * dz);
+                    const verticalDistance = Math.abs(dy);
+
+                    if (horizontalDistance < 2 && verticalDistance < 5) {
+                        const foodType = platform.userData.foodType;
+                        scene.remove(platform);
+                        gameState.platforms.splice(i, 1);
+
+                        // 记录已拾取的食物类型
+                        gameState.collectedFoodTypes.add(foodType);
+
+                        // 应用食物效果
+                        applyFoodEffect(foodType);
+
+                        // 显示拾取提示
+                        const foodNames = {
+                            'lightning': '闪电果',
+                            'bounce': '蹦蹦果',
+                            'flight': '飞行果',
+                            'slow': '迟缓果',
+                            'short': '短腿果'
+                        };
+                        showNotification(`🍎 ${foodNames[foodType]}`, '');
+
+                        return;
+                    }
+                }
+            }
+        }
+
+        // 应用食物效果
+        function applyFoodEffect(foodType) {
+            const now = Date.now();
+
+            switch(foodType) {
+                case 'lightning':
+                    gameState.activeEffects.speedBoost = now + 30000;
+                    break;
+                case 'bounce':
+                    gameState.activeEffects.jumpBoost = now + 30000;
+                    break;
+                case 'flight':
+                    gameState.activeEffects.flight = now + 5000;
+                    gameState.isFlying = true;
+                    gameState.isCreator = true;
+                    break;
+                case 'slow':
+                    gameState.activeEffects.speedSlow = now + 30000;
+                    break;
+                case 'short':
+                    gameState.activeEffects.jumpShort = now + 30000;
+                    break;
+            }
+        }
+
+        // 检查是否拾取钥匙
+        function checkKeyPickup() {
+            if (gameState.hasKey) return;
+            if (!gameState.player) return;
+
+            for (let i = gameState.platforms.length - 1; i >= 0; i--) {
+                const platform = gameState.platforms[i];
+                if (platform.userData.type === 'key') {
+                    const dx = gameState.player.position.x - platform.position.x;
+                    const dz = gameState.player.position.z - platform.position.z;
+                    const distance = Math.sqrt(dx * dx + dz * dz);
+
+                    if (distance < 5) {
+                        gameState.hasKey = true;
+                        gameState.keyPosition = platform.position;
+                        scene.remove(platform);
+                        gameState.platforms.splice(i, 1);
+
+                        if (!gameState.achievements.隐藏的密钥 && !gameState.achievements.作弊者 && !gameState.achievements.伪神) {
+                            gameState.achievements.隐藏的密钥 = true;
+                            showAchievement('🔑 隐藏的密钥');
+                        }
+
+                        const pickupDiv = document.createElement('div');
+                        pickupDiv.style.cssText = `
+                            position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #ffd700 0%, #ff9500 100%);
+                            color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; text-align: center; font-size: 20px;
+                        `;
+                        pickupDiv.innerHTML = '🔑 已拾取';
+                        document.body.appendChild(pickupDiv);
+                        setTimeout(() => pickupDiv.remove(), 2000);
+                        return;
+                    }
+                }
+            }
+        }
+
+        function checkChestInteraction() {
+            if (!gameState.player) return;
+
+            for (let i = gameState.platforms.length - 1; i >= 0; i--) {
+                const platform = gameState.platforms[i];
+                if (platform.userData.type === 'chest' && !platform.userData.isOpened) {
+                    const dx = gameState.player.position.x - platform.position.x;
+                    const dz = gameState.player.position.z - platform.position.z;
+                    const distance = Math.sqrt(dx * dx + dz * dz);
+
+                    if (distance < 1.5) {
+                        if (gameState.hasKey) {
+                            platform.userData.isOpened = true;
+
+                            if (!gameState.achievements.旧时代的馈赠) {
+                                gameState.achievements.旧时代的馈赠 = true;
+                                showAchievement('🎁 旧时代的馈赠');
+                            }
+
+                            gameState.hasJumpBoost = true;
+
+                            showNotification('🎁 宝箱已开启', '⬆️ 跳跃高度 +50%');
+
+                            scene.remove(platform);
+                            gameState.platforms.splice(i, 1);
+                            return;
+                        } else {
+                            showNotification('🔒 需要钥匙才能打开', '');
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        function updatePlayerMovement() {
+            if (!gameState.isPlaying) return;
+
+            const player = gameState.player;
+            const keys = gameState.keys;
+
+            // 飞行模式
+            if (gameState.isFlying) {
+                let inputX = 0; let inputY = 0; let inputZ = 0;
+                let speed = gameState.isSprinting && gameState.stamina > 0 ? playerConfig.sprintSpeed * 3.0 : playerConfig.walkSpeed * 3.0;
+
+                // 应用闪电果效果
+                if (gameState.activeEffects.speedBoost && Date.now() < gameState.activeEffects.speedBoost) {
+                    speed *= 1.3;
+                }
+                // 应用迟缓果效果
+                if (gameState.activeEffects.speedSlow && Date.now() < gameState.activeEffects.speedSlow) {
+                    speed *= 0.7;
+                }
+
+                if (keys.w) inputZ += 1;
+                if (keys.s) inputZ -= 1;
+                if (keys.a) inputX += 1;
+                if (keys.d) inputX -= 1;
+                if (keys.space) inputY += 1;
+                if (keys.shift) inputY -= 1;
+
+                if (inputX !== 0 || inputY !== 0 || inputZ !== 0) {
+                    const length = Math.sqrt(inputX*inputX + inputY*inputY + inputZ*inputZ);
+                    inputX = (inputX / length) * speed;
+                    inputY = (inputY / length) * speed;
+                    inputZ = (inputZ / length) * speed;
+
+                    const sinAngle = Math.sin(gameState.cameraAngle);
+                    const cosAngle = Math.cos(gameState.cameraAngle);
+
+                    // x,z direction
+                    const finalMoveX = inputX * cosAngle + inputZ * sinAngle;
+                    const finalMoveZ = -inputX * sinAngle + inputZ * cosAngle;
+
+                    player.position.x += finalMoveX;
+                    player.position.y += inputY;
+                    player.position.z += finalMoveZ;
+                }
+
+                gameState.currentHeight = Math.max(0, Math.floor(player.position.y));
+                if (gameState.currentHeight > gameState.bestHeight) gameState.bestHeight = gameState.currentHeight;
+                checkKeyPickup();
+                checkFoodPickup();
+                checkChestInteraction();
+                checkAchievements();
+
+                // 处理食物效果过期
+                const now = Date.now();
+                if (gameState.activeEffects.flight && now > gameState.activeEffects.flight) {
+                    gameState.activeEffects.flight = null;
+                    gameState.isFlying = false;
+                    gameState.isCreator = false;
+                    showNotification('🏃 普通模式', '飞行效果已结束');
+                }
+
+                if (gameState.isSprinting && (keys.w || keys.a || keys.s || keys.d || keys.space || keys.shift)) {
+                    gameState.stamina = Math.max(0, gameState.stamina - playerConfig.staminaDrain * 2);
+                } else {
+                    gameState.stamina = Math.min(100, gameState.stamina + playerConfig.staminaRegen);
+                }
+                return;
+            }
+
+            // 普通模式
+            let inputX = 0; let inputZ = 0;
+            let speed = gameState.isSprinting && gameState.stamina > 0 ? playerConfig.sprintSpeed : playerConfig.walkSpeed;
+
+            // 应用闪电果效果
+            if (gameState.activeEffects.speedBoost && Date.now() < gameState.activeEffects.speedBoost) {
+                speed *= 1.3;
+            }
+            // 应用迟缓果效果
+            if (gameState.activeEffects.speedSlow && Date.now() < gameState.activeEffects.speedSlow) {
+                speed *= 0.7;
+            }
+
+            if (keys.w) inputZ += 1;
+            if (keys.s) inputZ -= 1;
+            if (keys.a) inputX += 1;
+            if (keys.d) inputX -= 1;
+
+            if (inputX !== 0 || inputZ !== 0) {
+                const length = Math.sqrt(inputX*inputX + inputZ*inputZ);
+                inputX = (inputX / length) * speed;
+                inputZ = (inputZ / length) * speed;
+
+                const sinAngle = Math.sin(gameState.cameraAngle);
+                const cosAngle = Math.cos(gameState.cameraAngle);
+
+                const finalMoveX = inputX * cosAngle + inputZ * sinAngle;
+                const finalMoveZ = -inputX * sinAngle + inputZ * cosAngle;
+
+                // 行走增加水平碰撞判定
+                if (!checkHorizontalCollision(player, player.position.x + finalMoveX, player.position.z)) {
+                    player.position.x += finalMoveX;
+                }
+                if (!checkHorizontalCollision(player, player.position.x, player.position.z + finalMoveZ)) {
+                    player.position.z += finalMoveZ;
+                }
+            }
+
+            // 跳跃
+            if (keys.space && gameState.isGrounded && gameState.canJump && gameState.jumpCooldown <= 0) {
+                let jumpMultiplier = gameState.hasJumpBoost ? 1.5 : 1.0;
+
+                // 应用蹦蹦果效果
+                if (gameState.activeEffects.jumpBoost && Date.now() < gameState.activeEffects.jumpBoost) {
+                    jumpMultiplier *= 1.3;
+                }
+                // 应用短腿果效果
+                if (gameState.activeEffects.jumpShort && Date.now() < gameState.activeEffects.jumpShort) {
+                    jumpMultiplier *= 0.7;
+                }
+
+                gameState.playerVelocity.y = playerConfig.jumpForce * jumpMultiplier;
+                gameState.isGrounded = false;
+                gameState.canJump = false;
+                gameState.jumpCooldown = 10;
+
+                // 记录跳跃时的当前高度为可能的坠落起点
+                if (gameState.currentHeight > gameState.fallStartHeight) {
+                    gameState.fallStartHeight = gameState.currentHeight;
+                }
+            }
+
+            // 重力
+            if (!gameState.isGrounded) {
+                gameState.playerVelocity.y -= playerConfig.gravity;
+                // 添加终端速度限制，防止穿模
+                if (gameState.playerVelocity.y < -0.8) {
+                    gameState.playerVelocity.y = -0.8;
+                }
+            }
+
+            player.position.y += gameState.playerVelocity.y;
+            checkIfOnPlatform(player);
+
+            if (gameState.jumpCooldown > 0) gameState.jumpCooldown--;
+            if (gameState.isGrounded && !keys.space) gameState.canJump = true;
+
+            if (keys.shift && (keys.w || keys.a || keys.s || keys.d)) {
+                gameState.isSprinting = true;
+                gameState.stamina = Math.max(0, gameState.stamina - playerConfig.staminaDrain);
+            } else {
+                gameState.isSprinting = false;
+                gameState.stamina = Math.min(100, gameState.stamina + playerConfig.staminaRegen);
+            }
+
+            gameState.currentHeight = Math.max(0, Math.floor(player.position.y));
+            if (gameState.currentHeight > gameState.bestHeight) gameState.bestHeight = gameState.currentHeight;
+
+            checkKeyPickup();
+            checkFoodPickup();
+            checkChestInteraction();
+            checkAchievements();
+
+            // 处理食物效果过期
+            const now = Date.now();
+            if (gameState.activeEffects.speedBoost && now > gameState.activeEffects.speedBoost) {
+                gameState.activeEffects.speedBoost = null;
+                showNotification('⚡ 速度恢复', '闪电果效果已结束');
+            }
+            if (gameState.activeEffects.jumpBoost && now > gameState.activeEffects.jumpBoost) {
+                gameState.activeEffects.jumpBoost = null;
+                showNotification('⬇️ 跳跃恢复', '蹦蹦果效果已结束');
+            }
+            if (gameState.activeEffects.speedSlow && now > gameState.activeEffects.speedSlow) {
+                gameState.activeEffects.speedSlow = null;
+                showNotification('⚡ 速度恢复', '迟缓果效果已结束');
+            }
+            if (gameState.activeEffects.jumpShort && now > gameState.activeEffects.jumpShort) {
+                gameState.activeEffects.jumpShort = null;
+                showNotification('⬇️ 跳跃恢复', '短腿果效果已结束');
+            }
+
+            if (player.position.y < -10) {
+                gameOver();
+            }
+
+            const highestPlatform = gameState.platforms.reduce((highest, platform) => {
+                return platform.position.y > highest ? platform.position.y : highest;
+            }, 0);
+
+            if (player.position.y > highestPlatform - 15) {
+                generateNewPlatform();
+            }
+        }
+
+        // 更新相机
+        function updateCamera() {
+            const player = gameState.player;
+            const distance = 8;
+            const baseHeight = 5;
+
+            if (gameState.cameraMode === 'firstperson') {
+                // 第一人称模式：相机在玩家头部，能看到脚底
+                camera.position.x = player.position.x;
+                camera.position.z = player.position.z;
+                camera.position.y = player.position.y + 0.5;
+
+                // 相机看向玩家前方
+                const lookAtY = player.position.y + 0.5 + Math.sin(gameState.cameraVertical) * 3;
+                const lookAtX = player.position.x + Math.sin(gameState.cameraAngle) * 10;
+                const lookAtZ = player.position.z + Math.cos(gameState.cameraAngle) * 10;
+                camera.lookAt(lookAtX, lookAtY, lookAtZ);
+
+                // 第一人称模式下隐藏玩家身体
+                if (player.children.length > 0) {
+                    player.children.forEach(child => {
+                        child.visible = false;
+                    });
+                }
+            } else {
+                // 第三人称模式：相机跟随玩家
+                // 使用垂直角度计算相机高度（范围扩大到3.0）
+                const verticalOffset = Math.sin(gameState.cameraVertical) * 4;
+                const cameraHeight = baseHeight + verticalOffset;
+
+                camera.position.x = player.position.x - Math.sin(gameState.cameraAngle) * distance;
+                camera.position.z = player.position.z - Math.cos(gameState.cameraAngle) * distance;
+                camera.position.y = player.position.y + cameraHeight;
+
+                // 相机看向玩家前方稍微偏上的位置（允许往下看）
+                const lookAtY = player.position.y + 1 + Math.sin(gameState.cameraVertical) * 3;
+                camera.lookAt(player.position.x, lookAtY, player.position.z);
+
+                // 第三人称模式下显示玩家身体
+                if (player.children.length > 0) {
+                    player.children.forEach(child => {
+                        child.visible = true;
+                    });
+                }
+            }
+        }
+
+        // 更新UI
+        function updateUI() {
+            document.getElementById('height').textContent = gameState.currentHeight;
+            document.getElementById('platforms').textContent = gameState.platformCount;
+            document.getElementById('best-height').textContent = gameState.bestHeight;
+            document.getElementById('stamina-fill').style.width = `${gameState.stamina}%`;
+
+            // 更新计时器
+            if (gameState.isPlaying) {
+                const elapsed = Date.now() - gameState.gameStartTime;
+                const minutes = Math.floor(elapsed / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                document.getElementById('timer').textContent = timeString;
+            }
+        }
+
+        // 检查成就
+        function checkAchievements() {
+            // 作弊者和伪神无法获得其他成就
+            if (gameState.achievements.作弊者 || gameState.achievements.伪神) {
+                return;
+            }
+
+            // 计算距离出生位置的横向距离
+            const distanceFromStart = Math.sqrt(
+                Math.pow(gameState.player.position.x, 2) +
+                Math.pow(gameState.player.position.z, 2)
+            );
+
+            // 找到最高平台
+            const highestPlatform = gameState.platforms.reduce((highest, platform) => {
+                return platform.position.y > highest.position.y ? platform : highest;
+            }, gameState.platforms[0]);
+
+            // 检查玩家是否在最高平台上
+            const isOnHighestPlatform = gameState.isGrounded &&
+                Math.abs(gameState.player.position.y - highestPlatform.position.y) < 1;
+
+            // 成就：初窥门径 - 第一次到达100米
+            if (gameState.currentHeight >= 100 && !gameState.achievements.初窥门径) {
+                gameState.achievements.初窥门径 = true;
+                showAchievement('🏆 初窥门径', '第一次到达100米！');
+            }
+
+            // 成就：这里风景不错 - 第一次到达300米
+            if (gameState.currentHeight >= 300 && !gameState.achievements.这里风景不错) {
+                gameState.achievements.这里风景不错 = true;
+                showAchievement('🌄 这里风景不错', '第一次到达300米！');
+            }
+
+            // 成就：登峰造极 - 第一次高度>500米
+            if (gameState.currentHeight > 500 && !gameState.achievements.登峰造极) {
+                gameState.achievements.登峰造极 = true;
+                showAchievement('🏔 登峰造极');
+
+                // 显示电影字幕
+                showSubtitle('登神之路被截断', 5000);
+                setTimeout(() => {
+                    showSubtitle('做出选择，开始真正的登神之路（K键）', 5000);
+                }, 5000);
+                setTimeout(() => {
+                    showSubtitle('或者成为这个小世界的神（L键）', 5000);
+
+                    // 字幕显示完后，弹出选项UI
+                    setTimeout(() => {
+                        gameState.showChoice = true;
+                        document.getElementById('choice-ui').style.display = 'block';
+                    }, 5000);
+                }, 10000);
+            }
+
+            // 成就：越界者？ - 第一次距离出生位置超过100米
+            if (distanceFromStart >= 100 && !gameState.achievements.越界者 && !gameState.hasMadeChoice) {
+                gameState.achievements.越界者 = true;
+                showAchievement('❓ 越界者？', '第一次距离出生位置超过100米！');
+            }
+
+            // 成就：真正的神明 - 新世界中高度到达两千米
+            if (gameState.currentHeight >= 2000 && !gameState.achievements.真正的神明 && gameState.hasMadeChoice) {
+                gameState.achievements.真正的神明 = true;
+                showAchievement('🎯 真正的神明');
+
+                // 自动开启创作者模式（不显示提示）
+                if (!gameState.isCreator) {
+                    gameState.isCreator = true;
+                }
+            }
+
+            // 成就：突破上限 - 新世界中高度到达500米
+            if (gameState.currentHeight >= 500 && !gameState.achievements.突破上限 && gameState.hasMadeChoice) {
+                gameState.achievements.突破上限 = true;
+                showAchievement('🎯 突破上限');
+            }
+
+            // 成就：宇航员 - 高度到达一万米
+            if (gameState.currentHeight >= 10000 && !gameState.achievements.宇航员) {
+                gameState.achievements.宇航员 = true;
+                showAchievement('🚀 宇航员');
+            }
+
+            // 成就：神农尝百草 - 获取所有食物至少一次
+            const allFoodTypes = ['lightning', 'bounce', 'flight', 'slow', 'short'];
+            const hasCollectedAllFoods = allFoodTypes.every(foodType => gameState.collectedFoodTypes.has(foodType));
+
+            if (hasCollectedAllFoods && !gameState.achievements.神农尝百草) {
+                gameState.achievements.神农尝百草 = true;
+                showAchievement('🌿 神农尝百草');
+            }
+
+            // 成就：为什么会变成这样呢？ - 同时拥有五种果子的效果
+            const now = Date.now();
+            const hasAllFoodEffects = gameState.activeEffects.speedBoost && now < gameState.activeEffects.speedBoost &&
+                                    gameState.activeEffects.jumpBoost && now < gameState.activeEffects.jumpBoost &&
+                                    gameState.activeEffects.flight && now < gameState.activeEffects.flight &&
+                                    gameState.activeEffects.speedSlow && now < gameState.activeEffects.speedSlow &&
+                                    gameState.activeEffects.jumpShort && now < gameState.activeEffects.jumpShort;
+
+            if (hasAllFoodEffects && !gameState.achievements.为什么会变成这样呢) {
+                gameState.achievements.为什么会变成这样呢 = true;
+                showAchievement('🤔 为什么会变成这样呢？');
+
+                // 给予复活点道具
+                gameState.hasRespawnPointItem = true;
+                showNotification('✨ 获得复活点道具', '按F键放置复活点，按G键传送到复活点');
+            }
+
+            // 检查是否获得了除"作弊者"和"伪神"外的所有成就
+            const allAchievements = [
+                '初窥门径', '这里风景不错', '登峰造极', '越界者',
+                '请为坠落的人类命名', '真正的神明', '新世界',
+                '突破上限', '宇航员', '隐藏的密钥', '旧时代的馈赠',
+                '神农尝百草', '为什么会变成这样呢', '信标救命'
+            ];
+
+            const allAchieved = allAchievements.every(achievement => gameState.achievements[achievement]);
+
+            if (allAchieved && !gameState.achievements.哈斯塔 && !gameState.hasScheduledTrueGodAchievement) {
+                gameState.hasScheduledTrueGodAchievement = true;
+                setTimeout(() => {
+                    gameState.achievements.哈斯塔 = true;
+                    showAchievement('👑 哈斯塔');
+                }, 5000);
+            }
+        }
+
+        // 显示成就
+        function showAchievement(title, description) {
+            const achievementDiv = document.createElement('div');
+            achievementDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                right: -400px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 20px 30px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                z-index: 1000;
+                text-align: left;
+                min-width: 300px;
+                animation: achievementSlide 3s ease-out forwards;
+            `;
+
+            const cleanTitle = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g, '');
+
+            achievementDiv.innerHTML = `
+                <div style="font-size: 18px; font-weight: bold;">${cleanTitle}</div>
+            `;
+            document.body.appendChild(achievementDiv);
+
+            setTimeout(() => {
+                achievementDiv.remove();
+            }, 3000);
+        }
+
+        function showNotification(title, description) {
+            const notificationDiv = document.createElement('div');
+            notificationDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px 50px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                z-index: 1000;
+                text-align: center;
+                animation: notificationPopup 3s ease-out forwards;
+            `;
+
+            const cleanTitle = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g, '');
+
+            notificationDiv.innerHTML = `
+                <div style="font-size: 24px; font-weight: bold;">${cleanTitle}</div>
+                ${description ? `<div style="font-size: 18px;">${description}</div>` : ''}
+            `;
+            document.body.appendChild(notificationDiv);
+
+            setTimeout(() => {
+                notificationDiv.remove();
+            }, 3000);
+        }
+
+        // 显示电影字幕
+        function showSubtitle(text, duration) {
+            const subtitleDiv = document.createElement('div');
+            subtitleDiv.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                padding: 20px 40px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                z-index: 1000;
+                text-align: center;
+                font-size: 24px;
+                font-weight: bold;
+                transition: opacity 0.3s;
+            `;
+            subtitleDiv.textContent = text;
+            document.body.appendChild(subtitleDiv);
+
+            // 持定时间后移除字幕
+            setTimeout(() => {
+                subtitleDiv.style.opacity = '0';
+                setTimeout(() => {
+                    subtitleDiv.remove();
+                }, 300);
+            }, duration);
+        }
+
+        // 添加成就动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes achievementSlide {
+                0% {
+                    right: -400px;
+                }
+                10% {
+                    right: 20px;
+                }
+                90% {
+                    right: 20px;
+                }
+                100% {
+                    right: -400px;
+                }
+            }
+            @keyframes notificationPopup {
+                0% {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(0.8);
+                }
+                20% {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1.05);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 游戏结束
+        function gameOver() {
+            gameState.isPlaying = false;
+
+            // 检查成就：请为坠落的人类命名 - 单次坠落高度大于250米
+            if (gameState.fallStartHeight >= 250 && !gameState.achievements.请为坠落的人类命名 && !gameState.achievements.作弊者 && !gameState.achievements.伪神) {
+                gameState.achievements.请为坠落的人类命名 = true;
+                showAchievement('💀 请为坠落的人类命名', '单次坠落高度大于250米！');
+            }
+
+            document.getElementById('final-height').textContent = gameState.currentHeight;
+            document.getElementById('final-platforms').textContent = gameState.platformCount;
+
+            // 根据是否有复活点显示复活按钮
+            const respawnBtn = document.getElementById('respawn-btn');
+            if (gameState.respawnPointPlaced) {
+                respawnBtn.style.display = 'block';
+            } else {
+                respawnBtn.style.display = 'none';
+            }
+
+            document.getElementById('game-over').style.display = 'block';
+        }
+
+        // 在复活点复活
+        function respawnAtRespawnPoint() {
+            if (!gameState.respawnPointPlaced) return;
+
+            // 传送玩家到复活点
+            gameState.player.position.set(
+                gameState.respawnPointPosition.x,
+                gameState.respawnPointPosition.y,
+                gameState.respawnPointPosition.z
+            );
+            gameState.playerVelocity = { x: 0, y: 0, z: 0 };
+            gameState.stamina = 100;
+            gameState.isPlaying = true;
+
+            // 隐藏游戏结束界面
+            document.getElementById('game-over').style.display = 'none';
+
+            showNotification('✨ 已在复活点复活', '');
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            // 清除旧平台
+            gameState.platforms.forEach(platform => scene.remove(platform));
+            gameState.platforms = [];
+
+            // 重置玩家状态
+            gameState.player.position.set(0, 1, 0);
+            gameState.playerVelocity = { x: 0, y: 0, z: 0 };
+            gameState.currentHeight = 0;
+            gameState.platformCount = 0;
+            gameState.stamina = 100;
+            gameState.isPlaying = true;
+            gameState.cameraAngle = 0;
+            gameState.hasScheduledTrueGodAchievement = false;
+            gameState.gameStartTime = Date.now();
+
+            // 重新创建平台
+            createInitialPlatforms();
+
+            // 隐藏游戏结束界面
+            document.getElementById('game-over').style.display = 'none';
+        }
+
+        // 创建新世界（新世界模式）
+        function createNewWorld(startX, startY, startZ, maxHeight) {
+            console.log('=== 创建新世界 ===');
+            console.log('起始位置:', startX, startY, startZ);
+            console.log('最高高度:', maxHeight);
+
+            // 清除旧平台
+            gameState.platforms.forEach(platform => scene.remove(platform));
+            gameState.platforms = [];
+
+            // 重置玩家状态
+            gameState.player.position.set(startX, startY, startZ);
+            gameState.playerVelocity = { x: 0, y: 0, z: 0 };
+            gameState.currentHeight = 0;
+            gameState.platformCount = 0;
+            gameState.isPlaying = true;
+            gameState.cameraAngle = 0;
+            gameState.hasScheduledTrueGodAchievement = false;
+
+            // 设置新的最高高度
+            gameState.maxHeight = maxHeight;
+
+            // 创建新场地（块减少，高度间隔增加，最高2000米）
+            const platformCount = 250;
+            const heightInterval = Math.min(10, maxHeight / platformCount);
+
+            console.log('平台数量:', platformCount);
+            console.log('高度间隔:', heightInterval);
+
+            for (let i = 0; i < platformCount; i++) {
+                const height = startY + i * heightInterval;
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 8 + Math.random() * 5;
+
+                const x = startX + Math.cos(angle) * distance;
+                const z = startZ + Math.sin(angle) * distance;
+
+                // 平台大小随高度增加而减少
+                const size = Math.max(1.5, 3 - (height / maxHeight) * 1.5);
+
+                console.log(`创建平台 ${i + 1}/${platformCount}:`, { x, y: height, z, size });
+                createPlatform(x, height, z, size, size, 0.5);
+            }
+
+            // 创建终点平台
+            createPlatform(startX, maxHeight, startZ, 4, 4);
+
+            // 在传送点前方十米放置宝箱
+            createTreasureChest(startX, 1, startZ + 40);
+
+            // 在新世界生成食物
+            const foodTypes = ['lightning', 'bounce', 'flight', 'slow', 'short'];
+            const foodCounts = {
+                'lightning': 5,
+                'bounce': 5,
+                'flight': 3,
+                'slow': 3,
+                'short': 3
+            };
+
+            const platforms = gameState.platforms.filter(p => p.userData && p.userData.type === 'platform');
+
+            foodTypes.forEach(foodType => {
+                const count = foodCounts[foodType];
+                for (let i = 0; i < count; i++) {
+                    const randomIndex = Math.floor(Math.random() * platforms.length);
+                    const randomPlatform = platforms[randomIndex];
+                    if (randomPlatform) {
+                        const offsetX = (Math.random() - 0.5) * 3;
+                        const offsetZ = (Math.random() - 0.5) * 3;
+                        createFood(
+                            randomPlatform.position.x + offsetX,
+                            randomPlatform.position.y + 0.5,
+                            randomPlatform.position.z + offsetZ,
+                            foodType
+                        );
+                    }
+                }
+            });
+
+            console.log('新世界创建完成！');
+        }
+
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+
+            gameState.platforms.forEach(p => {
+                if (p.userData.type === 'key') {
+                    p.rotation.y += 0.02;
+                }
+            });
+
+            if (gameState.player) {
+                updatePlayerMovement();
+                updateCamera();
+                updateUI();
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // 键盘事件
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+
+            if (key === 'w') gameState.keys.w = true;
+            if (key === 'a') gameState.keys.a = true;
+            if (key === 's') gameState.keys.s = true;
+            if (key === 'd') gameState.keys.d = true;
+            if (key === ' ') {
+                e.preventDefault();
+                gameState.keys.space = true;
+            }
+            if (key === 'shift') gameState.keys.shift = true;
+            if (key === 'v') {
+                e.preventDefault();
+                // 切换视角模式
+                gameState.cameraMode = gameState.cameraMode === 'thirdperson' ? 'topdown' : 'thirdperson';
+            }
+            if (key === 'n') {
+                e.preventDefault();
+                // 切换视角模式
+                gameState.cameraMode = gameState.cameraMode === 'thirdperson' ? 'firstperson' : 'thirdperson';
+
+                // 显示视角模式提示
+                if (gameState.cameraMode === 'firstperson') {
+                    showNotification('👁 第一人称', '按N键切换回第三人称');
+                } else {
+                    showNotification('🎥 第三人称', '按N键切换回第一人称');
+                }
+            }
+
+            if (key === 'k') {
+                e.preventDefault();
+                console.log('=== K键被按下 ===');
+                console.log('gameState.showChoice:', gameState.showChoice);
+                console.log('选项UI显示状态:', document.getElementById('choice-ui').style.display);
+
+                // 开启真正的登神之路
+                if (!gameState.showChoice) {
+                    console.log('❌ 选项未准备好，无法开启新世界');
+                    return;
+                }
+
+                console.log('✅ 开始创建新世界');
+
+                // 标记已经做出选择
+                gameState.hasMadeChoice = true;
+
+                // 传送玩家到新场地
+                gameState.player.position.set(11451, 1, 0);
+                gameState.playerVelocity = { x: 0, y: 0, z: 0 };
+
+                // 创建新场地（块减少，高度间隔增加，最高2000米）
+                createNewWorld(11451, 1, 0, 2000);
+
+                // 获得成就：新世界
+                if (!gameState.achievements.新世界) {
+                    gameState.achievements.新世界 = true;
+                    showAchievement('🌍 新世界');
+                }
+
+                // 隐藏选项UI
+                document.getElementById('choice-ui').style.display = 'none';
+                gameState.showChoice = false;
+            }
+
+            if (key === 'l') {
+                e.preventDefault();
+                // 成为伪神
+                if (!gameState.showChoice) return;
+
+                // 开启飞行模式
+                gameState.isFlying = true;
+
+                // 获得成就：伪神
+                if (!gameState.achievements.伪神) {
+                    gameState.achievements.伪神 = true;
+                    showAchievement('🌟 伪神');
+                }
+
+                // 隐藏选项UI
+                document.getElementById('choice-ui').style.display = 'none';
+                gameState.showChoice = false;
+            }
+
+            if (key === 'c') {
+                e.preventDefault();
+                // 切换创作者模式
+                gameState.isCreator = !gameState.isCreator;
+
+                // 显示创作者模式提示
+                if (gameState.isCreator) {
+                    showNotification('🎨 创作者模式', '按C键关闭');
+                } else {
+                    showNotification('🎨 普通模式', '按C键开启');
+                }
+            }
+
+            if (key === 'y') {
+                e.preventDefault();
+                // 切换飞行模式
+                const wasFlying = gameState.isFlying;
+                gameState.isFlying = !gameState.isFlying;
+
+                // 创作者模式下不触发作弊者成就
+                if (!gameState.isCreator && !gameState.achievements.作弊者) {
+                    gameState.achievements.作弊者 = true;
+                    showAchievement('⚠️ 作弊者', '开启飞行模式！作弊者无法获得其他成就。');
+                } else {
+                    if (gameState.isFlying) {
+                        showNotification('🚀 飞行模式', '按Y键关闭');
+                    } else {
+                        showNotification('🏃 普通模式', '按Y键开启');
+                        // 如果之前在飞行模式，现在切换到普通模式，记录当前高度为可能的坠落起点
+                        if (wasFlying) {
+                            gameState.fallStartHeight = Math.max(gameState.fallStartHeight, gameState.currentHeight);
+                        }
+                    }
+                }
+            }
+
+            if (key === 'tab') {
+                e.preventDefault();
+                // 切换操作提示的显示状态
+                const controlsHint = document.getElementById('controls-hint');
+                if (controlsHint) {
+                    gameState.controlsHintMinimized = !gameState.controlsHintMinimized;
+                    if (gameState.controlsHintMinimized) {
+                        controlsHint.classList.add('minimized');
+                    } else {
+                        controlsHint.classList.remove('minimized');
+                    }
+                }
+            }
+
+            if (key === 'p') {
+                e.preventDefault();
+                const achievementsUI = document.getElementById('achievements-ui');
+                if (achievementsUI.style.display === 'none' || achievementsUI.style.display === '') {
+                    // 显示成就列表
+                    showAchievementsList();
+                } else {
+                    // 关闭成就列表
+                    achievementsUI.style.display = 'none';
+                }
+            }
+
+            if (key === 'f') {
+                e.preventDefault();
+                // 放置复活点
+                if (gameState.hasRespawnPointItem && !gameState.respawnPointPlaced && gameState.isGrounded) {
+                    gameState.respawnPointPosition = {
+                        x: gameState.player.position.x,
+                        y: gameState.player.position.y + 1,
+                        z: gameState.player.position.z
+                    };
+                    gameState.respawnPointPlaced = true;
+                    showNotification('📍 复活点已放置', '按G键传送到复活点');
+                }
+            }
+
+            if (key === 'g') {
+                e.preventDefault();
+                // 传送到复活点
+                if (gameState.respawnPointPlaced) {
+                    gameState.player.position.set(
+                        gameState.respawnPointPosition.x,
+                        gameState.respawnPointPosition.y,
+                        gameState.respawnPointPosition.z
+                    );
+                    gameState.playerVelocity = { x: 0, y: 0, z: 0 };
+                    showNotification('✨ 已传送到复活点', '');
+
+                    // 增加G键使用次数
+                    gameState.gKeyUseCount++;
+
+                    // 检查是否达到100次
+                    if (gameState.gKeyUseCount >= 100 && !gameState.achievements.信标救命 && !gameState.achievements.作弊者 && !gameState.achievements.伪神) {
+                        gameState.achievements.信标救命 = true;
+                        showAchievement('📡 信标救命', '使用G键传送100次！');
+                    }
+                }
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+
+            if (key === 'w') gameState.keys.w = false;
+            if (key === 'a') gameState.keys.a = false;
+            if (key === 's') gameState.keys.s = false;
+            if (key === 'd') gameState.keys.d = false;
+            if (key === ' ') gameState.keys.space = false;
+            if (key === 'shift') gameState.keys.shift = false;
+        });
+
+        // 鼠标事件与 PointerLock API
+        const blocker = document.getElementById('blocker');
+        function startGameSession() {
+            if (blocker) blocker.style.display = 'none';
+            gameState.isPlaying = true;
+            if (gameState.pausedTime > 0) {
+                const pauseDuration = Date.now() - gameState.pausedTime;
+                gameState.gameStartTime += pauseDuration;
+                gameState.pausedTime = 0;
+            }
+        }
+
+        function pauseGameSession() {
+            if (blocker) blocker.style.display = 'flex';
+            gameState.isPlaying = false;
+            Object.keys(gameState.keys).forEach(k => gameState.keys[k] = false);
+            gameState.pausedTime = Date.now();
+        }
+
+        if (blocker) {
+            blocker.addEventListener('click', () => {
+                try {
+                    const lockRequest = document.body.requestPointerLock?.();
+                    if (lockRequest && typeof lockRequest.catch === 'function') {
+                        lockRequest.catch(() => startGameSession());
+                    } else if (!lockRequest) {
+                        startGameSession();
+                    }
+                } catch (error) {
+                    startGameSession();
+                }
+            });
+        }
+
+        document.addEventListener('pointerlockchange', () => {
+            if (document.pointerLockElement === document.body) {
+                startGameSession();
+            } else {
+                pauseGameSession();
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (document.pointerLockElement !== document.body || !gameState.isPlaying) return;
+
+            const movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+            const movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
+
+            gameState.cameraAngle -= movementX * 0.002;
+            gameState.cameraVertical = Math.max(-3.0, Math.min(3.0, gameState.cameraVertical + movementY * 0.002));
+        });
+
+        // 重新开始按钮
+        document.getElementById('restart-btn').addEventListener('click', restartGame);
+
+        // 复活按钮
+        document.getElementById('respawn-btn').addEventListener('click', respawnAtRespawnPoint);
+
+        // 窗口大小调整
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 显示成就列表
+        function showAchievementsList() {
+            const achievementsUI = document.getElementById('achievements-ui');
+            const achievementsList = document.getElementById('achievements-list');
+
+            // 清空列表
+            achievementsList.innerHTML = '';
+
+            // 检查是否获得了作弊者或伪神成就
+            const hasCheater = gameState.achievements.作弊者;
+            const hasFalseGod = gameState.achievements.伪神;
+
+            // 遍历所有成就
+            for (const [name, completed] of Object.entries(gameState.achievements)) {
+                // 如果获得了作弊者成就，只显示作弊者成就
+                if (hasCheater) {
+                    if (name !== '作弊者') continue;
+                }
+                // 如果获得了伪神成就，只显示伪神成就
+                else if (hasFalseGod) {
+                    if (name !== '伪神') continue;
+                }
+                // 如果没有获得作弊者或伪神成就，不显示这两个成就
+                else {
+                    if (name === '作弊者' || name === '伪神') continue;
+                }
+
+                const achievementCard = document.createElement('div');
+                achievementCard.style.cssText = `
+                    background: ${completed ? 'rgba(78, 204, 163, 0.15)' : 'rgba(100, 100, 100, 0.15)'};
+                    border: 2px solid ${completed ? '#4ecca3' : '#666'};
+                    border-radius: 10px;
+                    padding: 15px;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    transition: all 0.3s ease;
+                    cursor: pointer;
+                `;
+
+                achievementCard.onmouseover = function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.3)';
+                };
+
+                achievementCard.onmouseout = function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                };
+
+                // 成就图标
+                const iconContainer = document.createElement('div');
+                iconContainer.style.cssText = `
+                    width: 60px;
+                    height: 60px;
+                    background: ${completed ? 'rgba(78, 204, 163, 0.3)' : 'rgba(100, 100, 100, 0.3)'};
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                `;
+
+                // 根据成就名称选择图标
+                let icon = '🏆';
+                if (name.includes('坠落')) icon = '💀';
+                else if (name.includes('神明') || name.includes('哈斯塔')) icon = '🌟';
+                else if (name.includes('神农')) icon = '🌱';
+                else if (name.includes('新世界')) icon = '🌍';
+                else if (name.includes('宇航员')) icon = '🚀';
+                else if (name.includes('密钥')) icon = '🔑';
+                else if (name.includes('馈赠')) icon = '🎁';
+                else if (name.includes('作弊')) icon = '⚠️';
+                else if (name.includes('伪神')) icon = '🌟';
+                else if (name.includes('为什么会变成这样呢')) icon = '🤔';
+
+                iconContainer.textContent = icon;
+
+                // 成就信息
+                const infoContainer = document.createElement('div');
+                infoContainer.style.cssText = `
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                `;
+
+                const nameElement = document.createElement('h3');
+                nameElement.style.cssText = `
+                    margin: 0 0 5px 0;
+                    color: ${completed ? '#4ecca3' : '#ccc'};
+                    font-size: 16px;
+                `;
+                nameElement.textContent = name;
+
+                const statusElement = document.createElement('div');
+                statusElement.style.cssText = `
+                    font-size: 12px;
+                    color: ${completed ? '#4ecca3' : '#999'};
+                `;
+                statusElement.textContent = completed ? '已完成' : '未完成';
+
+                infoContainer.appendChild(nameElement);
+                infoContainer.appendChild(statusElement);
+
+                // 完成状态标记
+                const statusMarker = document.createElement('div');
+                statusMarker.style.cssText = `
+                    width: 24px;
+                    height: 24px;
+                    background: ${completed ? '#4ecca3' : '#666'};
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    font-weight: bold;
+                `;
+
+                if (completed) {
+                    statusMarker.textContent = '✓';
+                }
+
+                achievementCard.appendChild(iconContainer);
+                achievementCard.appendChild(infoContainer);
+                achievementCard.appendChild(statusMarker);
+                achievementsList.appendChild(achievementCard);
+            }
+
+            // 显示成就UI
+            achievementsUI.style.display = 'flex';
+            achievementsUI.style.flexDirection = 'column';
+        }
+
+        // 关闭成就列表
+        document.getElementById('close-achievements').addEventListener('click', function() {
+            document.getElementById('achievements-ui').style.display = 'none';
+        });
+
+        // 初始化游戏
+        gameState.player = createPlayer();
+        createInitialPlatforms();
+        animate();
+    </script>
 </body>
 </html>
