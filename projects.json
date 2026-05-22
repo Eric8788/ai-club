@@ -154,10 +154,9 @@
     "description": "A serious 2D sailing simulator for learning wind, sail, rudder, force, and boat movement.",
     "tags": ["Sailing", "2D", "Simulation"],
     "cover": "./covers/sailer.jpg",
-    "port": "5180",
-    "localPath": "/",
-    "type": "dynamic",
-    "deploymentTarget": "Static Build Recommended"
+    "localPath": "./projects/sailer-2d/index.html",
+    "type": "static",
+    "deploymentTarget": "Vercel Static Hub"
   },
   {
     "id": "lucy-grass",
